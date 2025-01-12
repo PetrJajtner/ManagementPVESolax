@@ -80,7 +80,16 @@ if ('registry' === $action) {
     $date = date('c');
     $result = true;
     foreach ($modified as $key => $value) {
-      file_put_contents(FILE_OUTPUT, "[{$date}] Registry setting: {$key} - {$original[$key]['value']} -> {$value}\n", FILE_APPEND);
+      $from = $original[$key]['value'];
+      $to = $value;
+      $unit = $original[$key]['unit'] ? " {$original[$key]['unit']}" : '';
+
+      if (false !== stripos($key, 'mode')) {
+        $from = $solax->getMode($key, $from);
+        $to = $solax->getMode($key, $to);
+      }
+
+      file_put_contents(FILE_OUTPUT, "[{$date}] Setting registry key \"{$key}\": {$from}{$unit} -> {$to}{$unit}\n", FILE_APPEND);
       $result = $result && $solax->setRegistryValue($key, $value);
     }
 

@@ -109,6 +109,23 @@ class X3HybridG4 extends SolaXInverter {
   }
 
   /**
+   * Vrati textovy popis rezimu
+   *
+   * @param string $key    Klic rezimu
+   * @param string $value  Ciselna hodnota rezimu
+   * @return string        Textovy popis
+   */
+  public function getMode($key, $value) {
+    if ('BatteryMode' === $key) {
+      return $this->_batteryMode($value);
+    }
+    if ('RunMode' === $key) {
+      return $this->_runMode($value);
+    }
+    return 'Unknown';
+  }
+
+  /**
    * Na zaklade dat, predanych klicu a priznaku pridani jednotky vrati transformovane hodnoty
    *
    * @param array $data   Namerena data stridace

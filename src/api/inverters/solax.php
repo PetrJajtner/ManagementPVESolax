@@ -23,6 +23,15 @@ abstract class SolaXInverter {
   protected const INT32_MAX = 0x7FFFFFFF;
 
   /**
+   * Vrati textovy popis rezimu
+   *
+   * @param string $key    Klic rezimu
+   * @param string $value  Ciselna hodnota rezimu
+   * @return string        Textovy popis
+   */
+  abstract public function getMode($key, $value);
+
+  /**
    * Na zaklade hodnot, predanych klicu a priznaku pridani jednotky vrati transformovane hodnoty
    *
    * @param array $values  Namerene hodnoty stridace
@@ -263,6 +272,29 @@ class SolaX {
   }
 
   /**
+   * Vrati textovy popis rezimu
+   *
+   * @param string $key    Klic rezimu
+   * @param string $value  Ciselna hodnota rezimu
+   * @return string        Textovy popis
+   */
+  public function getMode($key, $value) {
+    if ('BiasMode' === $key) {
+      return $this->_biasMode($value);
+    }
+    if ('ManualModeCharging' === $key) {
+      return $this->_manualMode($value);
+    }
+    if ('WorkingMode' === $key) {
+      return $this->_workingMode($value);
+    }
+    if (null !== $this->__inverter) {
+      return $this->__inverter->getMode($key, $value);
+    }
+    return 'Unknown';
+  }
+
+  /**
    * Vrati aktualni hodnotu konkretniho senzoru ze SolaX
    *
    * @param string $key   Nazev senzoru
@@ -496,6 +528,18 @@ class SolaX {
     return array_key_exists($value, self::BIAS_MODES)
             ? self::BIAS_MODES[$value]
             : 'BiasModeUnknown';
+  }
+
+  /**
+   * Vrati textovy popis manualniho rezimu
+   *
+   * @param int $value
+   * @return string
+   */
+  protected function _manualMode($value) {
+    return array_key_exists($value, self::MANUAL_MODES)
+            ? self::MANUAL_MODES[$value]
+            : 'ManualModeUnknown';
   }
 
   /**
