@@ -1,0 +1,63 @@
+<h1>{{'Help'|translate}}</h1>
+<fieldset>
+  <legend>{{'HelpAbout'|translate}}</legend>
+
+  <p>
+    <strong>{{'ApplicationName'|translate}}:</strong>
+    <span>{{applicationVersion || '&nbsp;'}}</span>
+  </p>
+  <p>
+    <strong>{{'HelpBuild'|translate}}:</strong>
+    <span>{{build}}</span>
+  </p>
+  <p>
+    <strong>{{'ApplicationDate'|translate}}:</strong>
+    <span>{{date|dateTime:'ff'}}</span>
+  </p>
+
+  <hr />
+
+  @if (inverterVersionsSg(); as versions) {
+    @if (versions.RegistrationNumber) {
+      <p>
+        <strong>{{'HelpRegistrationNumber'|translate}}:</strong>
+        <span>{{versions.RegistrationNumber}}</span>
+      </p>
+    }
+    @if (versions.InvSerialNumber) {
+      <p>
+        <strong>{{'HelpInvSerialNumber'|translate}}:</strong>
+        <span>{{versions.InvSerialNumber}}</span>
+      </p>
+    }
+    @if (versions.FirmwareVersion) {
+      <p>
+        <strong>{{'HelpFirmwareVersion'|translate}}:</strong>
+        <span>{{versions.FirmwareVersion}}</span>
+      </p>
+    }
+    @if (versions.ArmVersion) {
+      <p>
+        <strong>{{'HelpArmVersion'|translate}}:</strong>
+        <span>{{versions.ArmVersion}}</span>
+      </p>
+    }
+    @if (versions.MainDSPVersion) {
+      <p>
+        <strong>{{'HelpMainDSPVersion'|translate}}:</strong>
+        <span>{{versions.MainDSPVersion}}</span>
+      </p>
+    }
+    @if (versions.SlaveDSPVersion) {
+      <p>
+        <strong>{{'HelpSlaveDSPVersion'|translate}}:</strong>
+        <span>{{versions.SlaveDSPVersion}}</span>
+      </p>
+    }
+  } @else {
+    <p>
+      <em>{{'Loading'|translate}}</em>
+    </p>
+  }
+
+</fieldset>

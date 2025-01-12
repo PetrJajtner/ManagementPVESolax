@@ -1,0 +1,7 @@
+{
+  "AvailableLanguages": ["cs", "en"],
+  "DataServerUrl": "/api",
+  "DefaultLanguage": "cs",
+  "Timezone": "Europe/Prague",
+  "Version": "1.0.1"
+}

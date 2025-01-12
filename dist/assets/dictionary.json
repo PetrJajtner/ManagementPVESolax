@@ -1,0 +1,537 @@
+{
+  "ApplicationDate": {
+    "cs": "Datum sestavení",
+    "en": "Build date"
+  },
+  "ApplicationName": {
+    "cs": "Řízení FVE Solax",
+    "en": "Solax PVE management"
+  },
+  "BatteryModeBackUp": {
+    "cs": "Režim zálohy",
+    "en": "Back up mode"
+  },
+  "BatteryModeFeedinPriority": {
+    "cs": "Priorita dodávky do sítě",
+    "en": "Feed-in priority"
+  },
+  "BatteryModeForceTimeUse": {
+    "cs": "Manuální režim",
+    "en": "Force time use"
+  },
+  "BatteryModeSelfUse": {
+    "cs": "Režim vlastní spotřeby",
+    "en": "Self use mode"
+  },
+  "BatteryModeUnknown": {
+    "cs": "Neznámý",
+    "en": "Unknown"
+  },
+  "BiasMode": {
+    "cs": "Režim ovlivnění",
+    "en": "Bias mode"
+  },
+  "BiasModeDisabled": {
+    "cs": "Zakázáno",
+    "en": "Disabled"
+  },
+  "BiasModeGrid": {
+    "cs": "Do sítě",
+    "en": "To grid"
+  },
+  "BiasModeINV": {
+    "cs": "Ze sítě",
+    "en": "From grid"
+  },
+  "BiasModeUnknown": {
+    "cs": "Neznámý",
+    "en": "Unknown"
+  },
+  "ErrorError": {
+    "cs": "Chyba",
+    "en": "Error"
+  },
+  "ErrorPageNotFound": {
+    "cs": "Požadovaná stránka nebyla nalezena",
+    "en": "The requested page was not found"
+  },
+  "ErrorPatternNotMatchN": {
+    "cs": "Údaj „%1“ neodpovídá vzoru „%2“",
+    "en": "The entry \"%1\" does not match the pattern \"%2\""
+  },
+  "ErrorRequired": {
+    "cs": "Povinný údaj",
+    "en": "Mandatory entry"
+  },
+  "Help": {
+    "cs": "Nápověda",
+    "en": "Help"
+  },
+  "HelpAbout": {
+    "cs": "O aplikaci",
+    "en": "About"
+  },
+  "HelpBuild": {
+    "cs": "Sestavení",
+    "en": "Build"
+  },
+  "HelpArmVersion": {
+    "cs": "Verze ARM",
+    "en": "ARM version"
+  },
+  "HelpFirmwareVersion": {
+    "cs": "Verze firmware",
+    "en": "Firmare version"
+  },
+  "HelpInvSerialNumber": {
+    "cs": "Ser. číslo střídače",
+    "en": "Inv. serial number"
+  },
+  "HelpMainDSPVersion": {
+    "cs": "Hlavní verze DSP",
+    "en": "Main DSP version"
+  },
+  "HelpRegistrationNumber": {
+    "cs": "Registrační číslo",
+    "en": "Registration num."
+  },
+  "HelpSlaveDSPVersion": {
+    "cs": "Podřízená v. DSP",
+    "en": "Slave DSP version"
+  },
+  "Index": {
+    "cs": "Přehled",
+    "en": "Overview"
+  },
+  "IndexSVGRadiatorTemperature": {
+    "cs": "Teplota chladiče",
+    "en": "Radiator temperature"
+  },
+  "IndexSVGRadiatorTemperatureInner": {
+    "cs": "Teplota uvnitř střídače",
+    "en": "Temperature inside the inverter"
+  },
+  "IndexSVGReserverPower": {
+    "cs": "Rezervovaný příkon",
+    "en": "Reserved power"
+  },
+  "IndexMarketPrices": {
+    "cs": "Výsledky denního trhu",
+    "en": "Daily market results"
+  },
+  "IndexMarketPricesCurrent": {
+    "cs": "Aktuální výsledky",
+    "en": "Current results"
+  },
+  "IndexMarketPricesPrediction": {
+    "cs": "Výsledky dalšího dne",
+    "en": "Next day results"
+  },
+  "IndexTableAverageInKWH": {
+    "cs": "Průměr (Kč/kWh)",
+    "en": "Average (CZK/kWh)"
+  },
+  "IndexTableAverageInMWH": {
+    "cs": "Průměr (Kč/MWh)",
+    "en": "Average (CZK/MWh)"
+  },
+  "IndexTableBiasPower": {
+    "cs": "Ovlivněný výkon",
+    "en": "Bias power"
+  },
+  "IndexTableCharging": {
+    "cs": "Nabíjení",
+    "en": "Charging"
+  },
+  "IndexTableConsumption": {
+    "cs": "Celk. sp.",
+    "en": "Tot. con."
+  },
+  "IndexTableConsumptionFull": {
+    "cs": "Celková spotřeba",
+    "en": "Total consumption"
+  },
+  "IndexTableDischarging": {
+    "cs": "Vybíjení",
+    "en": "Discharging"
+  },
+  "IndexTableExportControl": {
+    "cs": "Řízení exportu",
+    "en": "Export control"
+  },
+  "IndexTableFromGrid": {
+    "cs": "Ze sítě",
+    "en": "From grid"
+  },
+  "IndexTableGrid": {
+    "cs": "Síť",
+    "en": "Grid"
+  },
+  "IndexTableHour": {
+    "cs": "Hodina",
+    "en": "Hour"
+  },
+  "IndexTableModeBattery": {
+    "cs": "Režim akumulátoru",
+    "en": "Battery mode"
+  },
+  "IndexTableModeInverter": {
+    "cs": "Režim střídače",
+    "en": "Inverter mode"
+  },
+  "IndexTablePriceInKWH": {
+    "cs": "Cena (Kč/kWh)",
+    "en": "Price (CZK/kWh)"
+  },
+  "IndexTablePriceInMWH": {
+    "cs": "Cena (Kč/MWh)",
+    "en": "Price (CZK/MWh)"
+  },
+  "IndexTableState": {
+    "cs": "Stav",
+    "en": "State"
+  },
+  "IndexTableSelfUse": {
+    "cs": "Vl. spotř.",
+    "en": "Self use"
+  },
+  "IndexTableSelfUseFull": {
+    "cs": "Vlastní spotřeba"
+  },
+  "IndexTableThreshold": {
+    "cs": "použitý práh",
+    "en": "threshold used"
+  },
+  "IndexTableToGrid": {
+    "cs": "Do sítě",
+    "en": "To grid"
+  },
+  "IndexTableToday": {
+    "cs": "Dnes",
+    "en": "Today"
+  },
+  "IndexTableTotal": {
+    "cs": "Celkem",
+    "en": "Total"
+  },
+  "IndexTableYield": {
+    "cs": "Výnos",
+    "en": "Yield"
+  },
+  "IndexTableYieldTotal": {
+    "cs": "Celkový výnos FVE",
+    "en": "Total PVE yield"
+  },
+  "Language": {
+    "cs": "čeština",
+    "en": "English"
+  },
+  "Loading": {
+    "cs": "Načítání…",
+    "en": "Loading…"
+  },
+  "ManualModeCharging": {
+    "cs": "Nucené nabíjení/vybíjení",
+    "en": "Force charge/discharge"
+  },
+  "ManualModeChargingOff": {
+    "cs": "Vypnuto",
+    "en": "Off"
+  },
+  "ManualModeForceCharge": {
+    "cs": "Nucené nabíjení",
+    "en": "Force charge"
+  },
+  "ManualModeForceDischarge": {
+    "cs": "Nucené vybíjení",
+    "en": "Force discharge"
+  },
+  "RunModeEPS": {
+    "cs": "Režim EPS",
+    "en": "EPS Mode"
+  },
+  "RunModeEPSCheck": {
+    "cs": "Kontrola EPS",
+    "en": "EPS Check"
+  },
+  "RunModeFault": {
+    "cs": "Porucha",
+    "en": "Fault"
+  },
+  "RunModeChecking": {
+    "cs": "Kontrola",
+    "en": "Checking"
+  },
+  "RunModeIdle": {
+    "cs": "Režim nečinnosti",
+    "en": "Idle"
+  },
+  "RunModeNormal": {
+    "cs": "Normální provoz",
+    "en": "Normal"
+  },
+  "RunModePermanentFault": {
+    "cs": "Trvalá porucha",
+    "en": "Permanent fault"
+  },
+  "RunModeSelfTest": {
+    "cs": "Autotest",
+    "en": "Self test"
+  },
+  "RunModeStandby": {
+    "cs": "Pohotovostní režim'",
+    "en": "Standby"
+  },
+  "RunModeUnknown": {
+    "cs": "Neznámý",
+    "en": "Unknown"
+  },
+  "RunModeUpdating": {
+    "cs": "Aktualizace",
+    "en": "Updating"
+  },
+  "RunModeWaiting": {
+    "cs": "Čekání",
+    "en": "Waiting"
+  },
+  "SelfUseMinSoC": {
+    "cs": "Minimální SOC",
+    "en": "Minimal SOC"
+  },
+  "Settings": {
+    "cs": "Nastavení",
+    "en": "Settings"
+  },
+  "SettingsAdvanced": {
+    "cs": "Pokročilé",
+    "en": "Advanced"
+  },
+  "SettingsApplication": {
+    "cs": "Nastavení aplikace",
+    "en": "Application settings"
+  },
+  "SettingsBasic": {
+    "cs": "Základní",
+    "en": "Basic"
+  },
+  "SettingsCircuitBreaker": {
+    "cs": "Hodnota jističe",
+    "en": "Circuit breaker value"
+  },
+  "SettingsDistributionConsumptionMultiplier": {
+    "cs": "Sazba za kWh bez DPH",
+    "en": "Rate per kWh without VAT"
+  },
+  "SettingsDistributionFixPrice": {
+    "cs": "Stálý měsíční plat (bez DPH)",
+    "en": "Fixed monthly fee (without DPH)"
+  },
+  "SettingsDongleID": {
+    "cs": "Identifikátor WIFI zařízení",
+    "en": "Dongle WIFI identifier"
+  },
+  "SettingsExportControl": {
+    "cs": "Řízení exportu",
+    "en": "Export management"
+  },
+  "SettingsExportOffValue": {
+    "cs": "Omezení výkonu",
+    "en": "Limiting power"
+  },
+  "SettingsExportOffValueInfo": {
+    "cs": "Přetoky vypnuty",
+    "en": "Overflows disabled"
+  },
+  "SettingsExportOnValue": {
+    "cs": "Výkon do sítě",
+    "en": "Power to the grid"
+  },
+  "SettingsExportOnValueInfo": {
+    "cs": "Přetoky zapnuty",
+    "en": "Overflows enabled"
+  },
+  "SettingsFailedToSaveRegistry": {
+    "cs": "Hodnoty registrů se nepodařilo uložit.",
+    "en": "Failed to save register values."
+  },
+  "SettingsFailedToSaveSettings": {
+    "cs": "Nastavení se nepodařilo uložit.",
+    "en": "Failed to save settings."
+  },
+  "SettingsGeneral": {
+    "cs": "Obecné",
+    "en": "General"
+  },
+  "SettingsInverter": {
+    "cs": "Nastavení střídače",
+    "en": "Inverter settings"
+  },
+  "SettingsLanguage": {
+    "cs": "Jazyk aplikace",
+    "en": "Application language"
+  },
+  "SettingsLocation": {
+    "cs": "IP adresa",
+    "en": "IP address"
+  },
+  "SettingsNormalizedVoltage": {
+    "cs": "Normalizované napětí",
+    "en": "Normalized voltage"
+  },
+  "SettingsPrices": {
+    "cs": "Ceny",
+    "en": "Prices"
+  },
+  "SettingsRegistry": {
+    "cs": "Nastavení registrů",
+    "en": "Registry settings"
+  },
+  "SettingsRegistryExportControl": {
+    "cs": "Řízení exportu",
+    "en": "Export control"
+  },
+  "SettingsRegistrySelfUseMinSoC": {
+    "cs": "Min. stav nabití akumulátoru",
+    "en": "Min. battery charge status"
+  },
+  "SettingsReset": {
+    "cs": "Obnovit",
+    "en": "Reset"
+  },
+  "SettingsSave": {
+    "cs": "Uložit",
+    "en": "Save"
+  },
+  "SettingsSmartCharge": {
+    "cs" : "Chytré nabíjení",
+    "en" : "Smart charge"
+  },
+  "SettingsSmartChargeOffPVEPower": {
+    "cs": "Povoleno do výkonu FVE",
+    "en": "Allowed to PVE power"
+  },
+  "SettingsSmartChargePricesCount": {
+    "cs": "Počet minimálních cen",
+    "en": "Number of minimum prices"
+  },
+  "SettingsSmartExport": {
+    "cs" : "Chytré řízení exportu",
+    "en" : "Smart export management"
+  },
+  "SettingsSmartExportHourEnd": {
+    "cs" : "do",
+    "en" : "to"
+  },
+  "SettingsSmartExportHours": {
+    "cs" : "hodin",
+    "en" : "hours"
+  },
+  "SettingsSmartExportHoursBelowThreshold": {
+    "cs" : "Min. počet hodin pod min. výkupní cenou",
+    "en" : "Min. number of hours under min. purchase price"
+  },
+  "SettingsSmartExportHourStart": {
+    "cs": "Časové rozmezí řízení od",
+    "en": "Trigger time range from"
+  },
+  "SettingsSmartExportMinBatterySoC": {
+    "cs": "Min. stav nabití akumulátoru",
+    "en": "Min. battery charge status"
+  },
+  "SettingsSmartExportMinPVEPower": {
+    "cs": "Min. výkon FVE",
+    "en": "Min. PVE power"
+  },
+  "SettingsSmartExportMonthEnd": {
+    "cs" : "do",
+    "en" : "to"
+  },
+  "SettingsSmartExportMonthStart": {
+    "cs" : "Řízení od",
+    "en" : "Management since"
+  },
+  "SettingsSmartExportPriceMultiplier": {
+    "cs": "Násobek min. výkupní ceny",
+    "en": "Min. purchase price multiplier"
+  },
+  "SettingsSmartExportUseNegativePrices": {
+    "cs": "Povolit použití záporných cen",
+    "en": "Allow using of negative prices"
+  },
+  "SettingsSpotControlled": {
+    "cs": "podle spotových cen",
+    "en": "according to spot prices"
+  },
+  "SettingsStatus": {
+    "cs": "Povolit řízení",
+    "en": "Allow management"
+  },
+  "SettingsSystemName": {
+    "cs": "Název instalace",
+    "en": "Installation name"
+  },
+  "SettingsSystemSize": {
+    "cs": "Velikost systému",
+    "en": "System size"
+  },
+  "SettingsTax": {
+    "cs": "Daň (jako násobek)",
+    "en": "Tax (as a multiple)"
+  },
+  "SettingsThreshold": {
+    "cs": "Min. výkupní cena",
+    "en": "Min. purchase price"
+  },
+  "SettingsUnitAmpere": {
+    "cs": "A",
+    "en": "A"
+  },
+  "SettingsUnitCurrency": {
+    "cs": "Kč",
+    "en": "CZK"
+  },
+  "SettingsUnitCurrencyPerMWH": {
+    "cs": "Kč/MWh",
+    "en": "CZK/MWh"
+  },
+  "SettingsUnitKW": {
+    "cs": "kW",
+    "en": "kW"
+  },
+  "SettingsUnitPercent": {
+    "cs": "%",
+    "en": "%"
+  },
+  "SettingsUnitVolt": {
+    "cs": "V",
+    "en": "V"
+  },
+  "SettingsUnitWatt": {
+    "cs": "W",
+    "en": "W"
+  },
+  "WorkingMode": {
+    "cs": "Pracovní režim",
+    "en": "Working mode"
+  },
+  "WorkingModeBackup": {
+    "cs": "Režim zálohy",
+    "en": "Back up mode"
+  },
+  "WorkingModeFeedIn": {
+    "cs": "Priorita přetoků do DS",
+    "en": "Feed-in priority"
+  },
+  "WorkingModeManual": {
+    "cs": "Manuál",
+    "en": "Manual"
+  },
+  "WorkingModeSelfUse": {
+    "cs": "Vlastní spotřeba",
+    "en": "Self use"
+  },
+  "WorkingModeUnknown": {
+    "cs": "Neznámý",
+    "en": "Unknown"
+  }
+}
