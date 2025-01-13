@@ -36,8 +36,8 @@
   "name": "solax",
   "private": true,
   "repository": {
-    "type": "svn",
-    "url": "https://svn.jajtnerovi.cz/apps/cz/jajtnerovi/solax/trunk"
+    "type": "git",
+    "url": "https://github.com/PetrJajtner/ManagementPVESolax"
   },
   "scripts": {
     "build": "ng build --configuration production && node ./bin/app.prettify.js",
