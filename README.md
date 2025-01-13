@@ -8,7 +8,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ### Installation
 
-The entire application is delivered in source code so that the user/programmer can build the application themselves or adapt it to their needs. It is necessary to have a web server ready, e.g. Apache and PHP. The installation procedure for Apache or PHP is not the subject of this readme.
+The entire application is delivered in source code so that the user/programmer can build the application themselves or adapt it to his/her needs. It is necessary to have a web server ready, e.g. Apache and PHP. The installation procedure for Apache or PHP is not the subject of this readme.
 
 We will copy the contents of the `/dist` folder to the root folder of the website. Then we will change the permissions of the `/api/data` directory to write and read by Apache or PHP. Files with OTE prices, charging, output from the launcher and settings will be written to this directory.
 
