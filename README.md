@@ -21,11 +21,11 @@ It is also necessary to add repeated script execution, e.g. using cron. The foll
    35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/charger.php' > /dev/null
 ```
 
-If everything is set up correctly, you can run the application on your domain. First of all, you need to set it up using the "Settings" tab. First of all, it concerns the communication of the application \<=> dongle. These are mainly the items "WIFI device identifier" and "IP address". These are mandatory items for communication with the inverter.
+If everything is set up correctly, you can run the application on your domain. First of all, you need to set it up using the "Settings" tab. First of all, it concerns the communication of the application \<=> dongle. These are mainly the items "Dongle WIFI identifier" and "IP address". These are mandatory items for communication with the inverter.
 
-![Mandatory settings](https://33333.cdn.cke-cs.com/kSW7V9NHUXugvhoQeFaf/images/fda7a00d2b4706532ac740e9825b2e74e1d4628517920a85.png)
+![Mandatory settings](/images/settings-en.png)
 
-You can use the "Test connection" buttons to test the connection with the inverter. After a successful connection, the most important application settings are complete.
+You can use the "Test connection" button to test the connection with the inverter. After a successful connection, the most important application settings are complete.
 
 Let it shine!
 
@@ -58,7 +58,7 @@ Dále je nutné doplnit pravidelné spouštění skriptů, např. pomocí cronu.
 
 Pokud máme správně vše nastaveno, je možné spustit aplikaci na vaší doméně. Nejdříve je potřeba ji nastavit pomocí záložky „Nastavení“. Především jde o komunikaci aplikace \<=> dongle. Jde především o položky „Identifikátor WIFI zařízení“ a „IP adresa“. To jsou povinné položky pro komunikaci se střídačem. 
 
-![Povinné nastavení](https://33333.cdn.cke-cs.com/kSW7V9NHUXugvhoQeFaf/images/910fc5c9d015719f9192ebab77498523a02650df19190c11.png)
+![Povinné nastavení](/images/settings-cs.png)
 
 K otestování spojení se střídačem je možné použít tlačítka „Otestovat spojení“. Po úspěšném spojení je nejdůležitější nastavení aplikace dokončeno.
 
