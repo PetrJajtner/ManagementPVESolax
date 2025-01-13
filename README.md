@@ -21,7 +21,7 @@ It is also necessary to add repeated script execution, e.g. using cron. The foll
    35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/charger.php' > /dev/null
 ```
 
-If everything is set up correctly, you can run the application on your domain. You need to set it up using the "Settings" tab. First of all, it concerns the communication of the application \<=> dongle. These are mainly the items "Dongle WIFI identifier" and "IP address". These are mandatory items for communication with the inverter.
+If everything is set up correctly, you can run the application on your domain. It is necessary to set up communication between the application and the WIFI dongle in the "Settings" tab. These are mainly the items "Dongle WIFI identifier" and "IP address". These are mandatory items for communication with the inverter.
 
 ![Mandatory settings](/images/settings-en.png)
 
@@ -56,7 +56,7 @@ Dále je nutné doplnit pravidelné spouštění skriptů, např. pomocí cronu.
    35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/charger.php' > /dev/null
 ```
 
-Pokud máme správně vše nastaveno, je možné spustit aplikaci na vaší doméně. Je potřeba ji nastavit pomocí záložky „Nastavení“. Především jde o komunikaci aplikace \<=> dongle. Jde především o položky „Identifikátor WIFI zařízení“ a „IP adresa“. To jsou povinné položky pro komunikaci se střídačem. 
+Pokud máme správně vše nastaveno, je možné spustit aplikaci na vaší doméně. Je nezbytné nastavit komunikaci mezi aplikací a WIFI donglem v záložce „Nastavení“. Jde především o položky „Identifikátor WIFI zařízení“ a „IP adresa“. To jsou povinné položky pro komunikaci se střídačem. 
 
 ![Povinné nastavení](/images/settings-cs.png)
 
