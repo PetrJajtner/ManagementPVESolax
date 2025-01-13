@@ -318,6 +318,18 @@
     "cs": "Hodnota jističe",
     "en": "Circuit breaker value"
   },
+  "SettingsConnectionEstablished": {
+    "cs": "Spojení úspěšně navázáno",
+    "en": "Connection successfully established"
+  },
+  "SettingsConnectionFailed": {
+    "cs": "Spojení NEBYLO navázáno",
+    "en": "Connection NOT established"
+  },
+  "SettingsConnectionTestFailedN": {
+    "cs": "Chyba při testování spojení: %1",
+    "en": "Error testing connection: %1"
+  },
   "SettingsDistributionConsumptionMultiplier": {
     "cs": "Sazba za kWh bez DPH",
     "en": "Rate per kWh without VAT"
@@ -477,6 +489,10 @@
   "SettingsTax": {
     "cs": "Daň (jako násobek)",
     "en": "Tax (as a multiple)"
+  },
+  "SettingsTestConnection": {
+    "cs": "Otestovat spojení",
+    "en": "Test connection"
   },
   "SettingsThreshold": {
     "cs": "Min. výkupní cena",

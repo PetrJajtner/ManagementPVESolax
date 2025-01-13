@@ -36,6 +36,11 @@ export const SERVER_PATH = '';
 export const PREFIX_DATA = '';
 
 /**
+ * URL testu spojeni na stridac Solax
+ */
+export const API_CONNECTION = 'connection';
+
+/**
  * URL zivych dat
  */
 export const API_LIVE_DATA = 'live-data';

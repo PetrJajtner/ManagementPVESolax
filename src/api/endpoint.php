@@ -5,6 +5,19 @@ require_once __DIR__ . '/constants.php';
 $action = $_REQUEST['action'];
 $method = $_SERVER['REQUEST_METHOD'];
 
+if ('connection' === $action && 'POST' === $method) {
+  require_once __DIR__ . '/inverters/solax.php';
+
+  $config = json_decode(file_get_contents('php://input'), true);
+  $solax = new SolaX($config);
+  $data = $solax->readVersion();
+
+  header('Content-type: application/json; charset="UTF-8"');
+  echo json_encode((object) ['Success' => 0 < count($data)], JSON_PRETTY_PRINT) . "\n";
+
+  exit;
+}
+
 if ('live-data' === $action) {
   require_once __DIR__ . '/inverters/solax.php';
 
@@ -94,7 +107,7 @@ if ('registry' === $action) {
     }
 
     header('Content-type: application/json; charset="UTF-8"');
-    echo json_encode((object) array('Success' => $result), JSON_PRETTY_PRINT) . "\n";
+    echo json_encode((object) ['Success' => $result], JSON_PRETTY_PRINT) . "\n";
 
     exit;
   }
@@ -114,7 +127,7 @@ if ('settings' === $action) {
     $result = false !== file_put_contents(FILE_SETTINGS, $json, LOCK_EX);
 
     header('Content-type: application/json; charset="UTF-8"');
-    echo json_encode((object) array('Success' => $result), JSON_PRETTY_PRINT) . "\n";
+    echo json_encode((object) ['Success' => $result], JSON_PRETTY_PRINT) . "\n";
 
     if ($data['Threshold'] !== $original['Threshold']) {
       require_once __DIR__.'/parser.php';

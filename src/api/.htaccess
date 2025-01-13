@@ -2,6 +2,7 @@ options -indexes
 
 RewriteEngine On
 
+RewriteRule ^connection$ ./endpoint.php?action=connection [L]
 RewriteRule ^live-data$  ./endpoint.php?action=live-data [L]
 RewriteRule ^prediction$ ./endpoint.php?action=prediction [L]
 RewriteRule ^prices$     ./endpoint.php?action=prices [L]

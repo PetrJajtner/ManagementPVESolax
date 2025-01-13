@@ -60,28 +60,6 @@
                 </p>
               }
             }
-            @if (data.settingsForm.controls['DongleID']; as dongleID) {
-              <p>
-                <label for="DongleID">{{'SettingsDongleID'|translate}}:</label>
-                <input [formControl]="dongleID"
-                       id="DongleID"
-                       type="text" />
-                @if (dongleID.errors) {
-                  <span class="error">{{dongleID.errors|errors:errorMap}}</span>
-                }
-              </p>
-            }
-            @if (data.settingsForm.controls['Location']; as location) {
-              <p>
-                <label for="Location">{{'SettingsLocation'|translate}}:</label>
-                <input [formControl]="location"
-                       id="Location"
-                       type="text" />
-                @if (location.errors) {
-                  <span class="error">{{location.errors|errors:errorMap}}</span>
-                }
-              </p>
-            }
             @if (data.settingsForm.controls['SupplyPoint']; as supplyPoint) {
               <p>
                 @if (supplyPoint.controls['PhasesCount']; as phasesCount) {
@@ -121,6 +99,37 @@
                   {{'SettingsUnitVolt'|translate}}
                 </p>
               }
+            }
+            @if (data.settingsForm.controls['DongleID']; as dongleID) {
+              <p>
+                <label for="DongleID">{{'SettingsDongleID'|translate}}:</label>
+                <input [formControl]="dongleID"
+                       id="DongleID"
+                       type="text" />
+                @if (dongleID.errors) {
+                  <span class="error">{{dongleID.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+            @if (data.settingsForm.controls['Location']; as location) {
+              <p>
+                <label for="Location">{{'SettingsLocation'|translate}}:</label>
+                <input [formControl]="location"
+                       id="Location"
+                       type="text" />
+                @if (location.errors) {
+                  <span class="error">{{location.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+            @if (data.settingsForm.controls['DongleID'] && data.settingsForm.controls['Location']) {
+              <p>
+                <button (click)="testConnection(data.settingsForm)"
+                        [disabled]="!data.settingsForm.controls['DongleID'].valid || !data.settingsForm.controls['Location'].valid"
+                        type="button">
+                  {{'SettingsTestConnection'|translate}}
+                </button>
+              </p>
             }
           </div>
         </fieldset>

@@ -186,4 +186,14 @@ export class IndexComponent {
     void this.__settingsSrv.saveSettings(this.__settingsSrv.settingsForm.value as SettingsType);
   }
 
+  /**
+   * Otestuje spojeni na stridac Solax
+   */
+  public testConnection(form: FormGroup<SettingsForm>): void {
+    void this.__settingsSrv.testConnection({
+      DongleID: form.controls.DongleID.value,
+      Location: form.controls.Location.value
+    });
+  }
+
 }

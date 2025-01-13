@@ -11,7 +11,7 @@ import {
   DistributionType, ExportType, RegistryType, SettingsType, SmartChargeType,
   SmartExportType, SupplyPointType, SystemType
 } from '@app/models/settings.model';
-import { API, API_REGISTRY, API_SETTINGS } from '@app/models/urls.model';
+import { API, API_CONNECTION, API_REGISTRY, API_SETTINGS } from '@app/models/urls.model';
 import { isBoolean, isNumeric, isString, logException } from '@app/models/utils.model';
 import { I18nService } from '@app/services/i18n.service';
 import { PricesService } from '@app/services/prices.service';
@@ -605,6 +605,32 @@ export class SettingsService {
    */
   public setRegistry(data: LiveData): void {
     void Promise.resolve().then(() => this.__registrySg.set(this.__fixRegistry(data)));
+  }
+
+  /**
+   * Otestuje spojeni na stridac Solax
+   */
+  public async testConnection(data: Partial<SettingsType>): Promise<void> {
+    this.__waitSrv.wait = true;
+    try {
+      const
+        options = {
+          body:    JSON.stringify(data),
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          headers: {'Content-Type': 'application/json'},
+          method:  'POST',
+          signal:  AbortSignal.timeout(10000) // 10s
+        },
+        response = await fetch(API.BuildUrl(API_CONNECTION), options),
+        result = (await response.json() as {Success: boolean})?.Success ?? false
+      ;
+
+      alert(this.__i18nSrv.translate(result ? 'SettingsConnectionEstablished' : 'SettingsConnectionFailed'));
+    } catch (error: unknown) {
+      alert(this.__i18nSrv.format('SettingsConnectionTestFailedN', (error as {message: string}).message));
+    } finally {
+      this.__waitSrv.wait = false;
+    }
   }
 
   /**
