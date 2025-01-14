@@ -1,6 +1,6 @@
 ## PVE Solax Management
 
-A simple management system for controlling PVE Solax
+_A simple management system for controlling PVE Solax_
 
 **Important notice:** I am not responsible for damage or system failures. The user is fully responsible for all damages.
 
@@ -15,7 +15,7 @@ We will copy the contents of the `/dist` folder to the root folder of the websit
 It is also necessary to add repeated script execution, e.g. using cron. The following lines must be added to the launcher configuration:
 
 ```plaintext
-# Spoustece Solax
+# Solax Triggers
    44    23  *  *  *  wget -q -t 3 -T 900 -O /dev/null 'http://[vase-domena]/api/parser.php?1' > /dev/null
 29,59     *  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/trigger.php?verbose=1' > /dev/null
    35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/charger.php' > /dev/null
@@ -27,6 +27,9 @@ If everything is set up correctly, you can run the application on your domain. I
 
 You can use the "Test connection" button to test the connection with the inverter. After a successful connection, the most important application settings are complete.
 
+_Current supported inverters_
+*   _X3 Hybrid G4_
+
 Let it shine!
 
 Petr
@@ -35,7 +38,7 @@ Petr
 
 ## Řízení FVE Solax
 
-Jednoduchý systém řízení pro ovládání PVE Solax
+_Jednoduchý systém řízení pro ovládání PVE Solax_
 
 **Důležité upozornění:** Nenesu žádnou odpovědnost za poškození nebo selhání systému. Za veškeré škody plně odpovídá uživatel.
 
@@ -62,7 +65,9 @@ Pokud máme správně vše nastaveno, je možné spustit aplikaci na vaší dom�
 
 K otestování spojení se střídačem je možné použít tlačítka „Otestovat spojení“. Po úspěšném spojení je nejdůležitější nastavení aplikace dokončeno.
 
+_Aktuální podporované střídače_
+*   _X3 Hybrid G4_
+
 Ať to svítí!
 
 Petr
-
