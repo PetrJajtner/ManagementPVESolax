@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Tridy pro zpracovani dat ze stridacu Solax
+ *
+ * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
+ * @copyright  Ing. Petr Jajtner 2024 - nyni
+ */
 require_once dirname(__DIR__).'/constants.php';
 
 /**
@@ -163,11 +169,13 @@ class SolaX {
     'A'       => 'A',
     'C'       => '°C',
     'HZ'      => 'Hz',
+    'KW'      => 'kW',
     'KWH'     => 'kWh',
     'NONE'    => '',
     'PERCENT' => '%',
     'V'       => 'V',
-    'W'       => 'W'
+    'W'       => 'W',
+    'WH'      => 'Wh'
   ];
 
   /**

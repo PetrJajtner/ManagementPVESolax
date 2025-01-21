@@ -91,6 +91,10 @@
     "cs": "Hlavní verze DSP",
     "en": "Main DSP version"
   },
+  "HelpNominalInvPower": {
+    "cs": "Nom. výkon stř.",
+    "en": "Nom. inv. power"
+  },
   "HelpRegistrationNumber": {
     "cs": "Registrační číslo",
     "en": "Registration num."
@@ -295,8 +299,8 @@
     "en": "Waiting"
   },
   "SelfUseMinSoC": {
-    "cs": "Minimální SOC",
-    "en": "Minimal SOC"
+    "cs": "Minimální SoC",
+    "en": "Minimal SoC"
   },
   "Settings": {
     "cs": "Nastavení",

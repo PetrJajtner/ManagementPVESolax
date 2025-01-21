@@ -60,7 +60,7 @@ export const DEFAULT_SETTINGS: SettingsType = {
     PhasesCount:         3
   },
   System: {
-    Name: 'Nazev instalace',
+    Name: 'Instalace',
     Size: 10000
   },
   Tax:       1.21,

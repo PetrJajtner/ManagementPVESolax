@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Model stridace X3 Hybrid G4
+ *
+ * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
+ * @copyright  Ing. Petr Jajtner 2024 - nyni
+ *
+ * Pozn.: na zaklade https://github.com/squishykid/solax/blob/master/solax/inverters/x3_hybrid_g4.py
+ */
 require_once __DIR__.'/solax.php';
 
 /**
@@ -38,61 +46,64 @@ class X3HybridG4 extends SolaXInverter {
    * Senzory stridace
    */
   private const SENSORS = [
-                                  // [index, jednotka, prevod]
-    'Grid1Voltage'                => [0, 'V', '_div10'],
-    'Grid2Voltage'                => [1, 'V', '_div10'],
-    'Grid3Voltage'                => [2, 'V', '_div10'],
-    'Grid1Current'                => [3, 'A', '_toSignedDiv10'],
-    'Grid2Current'                => [4, 'A', '_toSignedDiv10'],
-    'Grid3Current'                => [5, 'A', '_toSignedDiv10'],
-    'Grid1Power'                  => [6, 'W', '_toSigned'],
-    'Grid2Power'                  => [7, 'W', '_toSigned'],
-    'Grid3Power'                  => [8, 'W', '_toSigned'],
-    'PV1Voltage'                  => [10, 'V', '_div10'],
-    'PV2Voltage'                  => [11, 'V', '_div10'],
-    'PV1Current'                  => [12, 'A', '_div10'],
-    'PV2Current'                  => [13, 'A', '_div10'],
-    'PV1Power'                    => [14, 'W'],
-    'PV2Power'                    => [15, 'W'],
-    'Grid1Frequency'              => [16, 'HZ', '_div100'],
-    'Grid2Frequency'              => [17, 'HZ', '_div100'],
-    'Grid3Frequency'              => [18, 'HZ', '_div100'],
-    'RunMode'                     => [19, 'NONE'],
-    'RunModeText'                 => [19, 'NONE', '_runMode'],
-    'EPS1Voltage'                 => [23, 'V', '_div10'],
-    'EPS2Voltage'                 => [24, 'V', '_div10'],
-    'EPS3Voltage'                 => [25, 'V', '_div10'],
-    'EPS1Current'                 => [26, 'A', '_toSignedDiv10'],
-    'EPS2Current'                 => [27, 'A', '_toSignedDiv10'],
-    'EPS3Current'                 => [28, 'A', '_toSignedDiv10'],
-    'EPS1Power'                   => [29, 'W', '_toSigned'],
-    'EPS2Power'                   => [30, 'W', '_toSigned'],
-    'EPS3Power'                   => [31, 'W', '_toSigned'],
-    'GridPower'                   => [[34, 35], 'W', '_toSigned32'],
-    'BatteryCurrent'              => [40, 'A', '_toSignedDiv100'],
-    'BatteryPower'                => [41, 'W', '_toSigned'],
-    'RadiatorTemperatureInner'    => [46, 'C', '_toSigned'],
-    'LoadPower'                   => [47, 'W', '_toSigned'],
-    'RadiatorTemperature'         => [54, 'C', '_toSigned'],
-    'YieldTotal'                  => [[68, 69], 'KWH', '_div10'],
-    'YieldToday'                  => [70, 'KWH', '_div10'],
-    'BatteryDischargeEnergyTotal' => [[74, 75], 'KWH', '_div10'],
-    'BatteryChargeEnergyTotal'    => [[76, 77], 'KWH', '_div10'],
-    'BatteryDischargeEnergyToday' => [78, 'KWH', '_div10'],
-    'BatteryChargeEnergyToday'    => [79, 'KWH', '_div10'],
-    'PVEnergyTotal'               => [[80, 81], 'KWH', '_div10'],
-    'EPSEnergyTotal'              => [[83, 84], 'KWH', '_div10'],
-    'EPSEnergyToday'              => [85, 'KWH', '_div10'],
-    'FeedInEnergyTotal'           => [[86, 87], 'KWH', '_div100'],
-    'ConsumedEnergyTotal'         => [[88, 89], 'KWH', '_div100'],
-    'FeedInEnergyToday'           => [[90, 91], 'KWH', '_div100'],
-    'ConsumedEnergyToday'         => [[92, 93], 'KWH', '_div100'],
-    'BatteryRemainingCapacity'    => [103, 'PERCENT'],
-    'BatteryTemperature'          => [105, 'C', '_toSigned'],
-    'BatteryRemainingEnergy'      => [106, 'KWH', '_div10'],
-    'BatteryMode'                 => [168, 'NONE'],
-    'BatteryModeText'             => [168, 'NONE', '_batteryMode'],
-    'BatteryVoltage'              => [[169, 170], 'V', '_div100']
+                                  // [     index,  jednotka, prevod]
+    'Grid1Voltage'                => [         0,       'V', '_div10'],
+    'Grid2Voltage'                => [         1,       'V', '_div10'],
+    'Grid3Voltage'                => [         2,       'V', '_div10'],
+    'Grid1Current'                => [         3,       'A', '_toSignedDiv10'],
+    'Grid2Current'                => [         4,       'A', '_toSignedDiv10'],
+    'Grid3Current'                => [         5,       'A', '_toSignedDiv10'],
+    'Grid1Power'                  => [         6,       'W', '_toSigned'],
+    'Grid2Power'                  => [         7,       'W', '_toSigned'],
+    'Grid3Power'                  => [         8,       'W', '_toSigned'],
+    'ACPowerTotal'                => [         9,       'W', '_toSigned'], // Soucet hodnot na indexu 6 + 7 + 8
+    'PV1Voltage'                  => [        10,       'V', '_div10'],
+    'PV2Voltage'                  => [        11,       'V', '_div10'],
+    'PV1Current'                  => [        12,       'A', '_div10'],
+    'PV2Current'                  => [        13,       'A', '_div10'],
+    'PV1Power'                    => [        14,       'W'],
+    'PV2Power'                    => [        15,       'W'],
+    'Grid1Frequency'              => [        16,       'HZ', '_div100'],
+    'Grid2Frequency'              => [        17,       'HZ', '_div100'],
+    'Grid3Frequency'              => [        18,       'HZ', '_div100'],
+    'RunMode'                     => [        19,     'NONE'],
+    'RunModeText'                 => [        19,     'NONE', '_runMode'],
+    'EPS1Voltage'                 => [        23,       'V', '_div10'],
+    'EPS2Voltage'                 => [        24,       'V', '_div10'],
+    'EPS3Voltage'                 => [        25,       'V', '_div10'],
+    'EPS1Current'                 => [        26,       'A', '_toSignedDiv10'],
+    'EPS2Current'                 => [        27,       'A', '_toSignedDiv10'],
+    'EPS3Current'                 => [        28,       'A', '_toSignedDiv10'],
+    'EPS1Power'                   => [        29,       'W', '_toSigned'],
+    'EPS2Power'                   => [        30,       'W', '_toSigned'],
+    'EPS3Power'                   => [        31,       'W', '_toSigned'],
+    'GridPower'                   => [  [34, 35],       'W', '_toSigned32'],
+    'BatteryCurrent'              => [        40,       'A', '_toSignedDiv100'],
+    'BatteryPower'                => [        41,       'W', '_toSigned'],
+    'BMSStatus'                   => [        45,    'NONE'],
+    'RadiatorTemperatureInner'    => [        46,       'C', '_toSigned'],
+    'LoadPower'                   => [        47,       'W', '_toSigned'],
+    'RadiatorTemperature'         => [        54,       'C', '_toSigned'],
+    'YieldTotal'                  => [  [68, 69],     'KWH', '_div10'],
+    'YieldToday'                  => [        70,     'KWH', '_div10'], // Vcetne vykonu z akumulatoru
+    'BatteryDischargeEnergyTotal' => [  [74, 75],     'KWH', '_div10'],
+    'BatteryChargeEnergyTotal'    => [  [76, 77],     'KWH', '_div10'],
+    'BatteryDischargeEnergyToday' => [        78,     'KWH', '_div10'],
+    'BatteryChargeEnergyToday'    => [        79,     'KWH', '_div10'],
+    'PVEnergyTotal'               => [  [80, 81],     'KWH', '_div10'],
+    'PVETodayYield'               => [        82,     'KWH', '_div10'], // Vykon z panelu
+    'EPSEnergyTotal'              => [  [83, 84],     'KWH', '_div10'],
+    'EPSEnergyToday'              => [        85,     'KWH', '_div10'],
+    'FeedInEnergyTotal'           => [  [86, 87],     'KWH', '_div100'],
+    'ConsumedEnergyTotal'         => [  [88, 89],     'KWH', '_div100'],
+    'FeedInEnergyToday'           => [  [90, 91],     'KWH', '_div100'],
+    'ConsumedEnergyToday'         => [  [92, 93],     'KWH', '_div100'],
+    'BatteryRemainingCapacity'    => [       103, 'PERCENT'],
+    'BatteryTemperature'          => [       105,       'C', '_toSigned'],
+    'BatteryRemainingEnergy'      => [       106,     'KWH', '_div10'],
+    'BatteryMode'                 => [       168,    'NONE'],
+    'BatteryModeText'             => [       168,    'NONE', '_batteryMode'],
+    'BatteryVoltage'              => [[169, 170],       'V', '_div100']
   ];
 
   /**
@@ -181,6 +192,7 @@ class X3HybridG4 extends SolaXInverter {
    */
   public function parseVersion(array $info) {
     return [
+      'NominalInvPower' => ['value' => $info[0], 'unit' => 'kW'],
       'InvSerialNumber' => "{$info[2]}",
       'ArmVersion'      => implode('–', [
         $this->__fixVersionNumber("{$info[6]}"),

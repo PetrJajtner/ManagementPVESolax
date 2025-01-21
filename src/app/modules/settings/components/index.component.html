@@ -672,8 +672,7 @@
                 </select>
                 &nbsp;
                 @if (0 !== +biasMode.value) {
-                  <input [attr.readonly]="settings.SmartCharge!.Status ? 'readonly' : undefined"
-                         [formControl]="data.registryForm.controls['BiasPower']"
+                  <input [formControl]="data.registryForm.controls['BiasPower']"
                          type="number" />
                   {{'SettingsUnitWatt'|translate}}
                   &nbsp;

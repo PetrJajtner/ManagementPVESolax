@@ -54,6 +54,12 @@
         <span>{{versions.SlaveDSPVersion}}</span>
       </p>
     }
+    @if (versions.NominalInvPower) {
+      <p>
+        <strong>{{'HelpNominalInvPower'|translate}}:</strong>
+        <span>{{versions.NominalInvPower.value}} {{versions.NominalInvPower.unit}}</span>
+      </p>
+    }
   } @else {
     <p>
       <em>{{'Loading'|translate}}</em>

@@ -16,7 +16,12 @@ const FILE_CHARGE = __DIR__ . '/data/charge.json';
 const FILE_OUTPUT = __DIR__ . '/data/output.txt';
 
 /**
- * Soubor JSON s cenami OTE
+ * Soubor JSON se zitrejsimi cenami OTE
+ */
+const FILE_PREDICTION = __DIR__ . '/data/prediction.json';
+
+/**
+ * Soubor JSON s dnesnimi cenami OTE
  */
 const FILE_PRICES = __DIR__ . '/data/prices.json';
 

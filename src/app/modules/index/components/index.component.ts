@@ -34,7 +34,6 @@ type ComponentData = {
  * Rozsirena ziva data o velikost a nazev systemu
  */
 type ExtendedLiveData = LiveData & {
-  GridPowerTotal:  Measurement;
   LoadPercent:     Measurement;
   PVESystemName:   string;
   PVESystemSize:   number;
@@ -111,7 +110,6 @@ export class IndexComponent {
    */
   private __extendedLiveDataSg: Signal<ExtendedLiveData> = computed(() => {
     const result = {
-      GridPowerTotal:  {value: 0, unit: 'W'} as Measurement,
       PVETotal:        {value: 0, unit: 'W'} as Measurement,
       PVETotalPercent: {value: 0, unit: '%'} as Measurement,
       LoadPercent:     {value: 0, unit: '%'} as Measurement,
@@ -122,10 +120,6 @@ export class IndexComponent {
     if (result.PV1Power && result.PV2Power) {
       result.PVETotal.value = result.PV1Power.value + result.PV2Power.value;
       result.PVETotal.unit = result.PV1Power.unit ?? result.PV2Power.unit;
-    }
-    if (result.Grid1Power && result.Grid2Power && result.Grid3Power) {
-      result.GridPowerTotal.value = result.Grid1Power.value + result.Grid2Power.value + result.Grid3Power.value;
-      result.GridPowerTotal.unit = result.Grid1Power.unit ?? result.Grid2Power.unit ?? result.Grid3Power.unit;
     }
     if (0 < result.PVESystemSize && result.PVETotal) {
       result.PVETotalPercent.value = +(result.PVETotal.value / result.PVESystemSize * 100).toFixed(1);

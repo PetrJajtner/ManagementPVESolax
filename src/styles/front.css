@@ -251,7 +251,7 @@ use[href="#flow"].animate.reverse {
 .menu-list__item-link--active {
   color: #f7b61e;
 }
-.percentage {
+.smaller {
   fill: #808080;
   font-size: 0.875rem;
 }

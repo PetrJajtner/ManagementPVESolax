@@ -83,6 +83,7 @@ export type Measurement = {
  * Ziva data FVE
  */
 export type RealTimeData = {
+  ACPowerTotal?:                Measurement;
   BatteryChargeEnergyToday?:    Measurement;
   BatteryChargeEnergyTotal?:    Measurement;
   BatteryCurrent?:              Measurement;
@@ -95,6 +96,7 @@ export type RealTimeData = {
   BatteryRemainingEnergy?:      Measurement;
   BatteryTemperature?:          Measurement;
   BatteryVoltage?:              Measurement;
+  BMSStatus?:                   Measurement;
   ConsumedEnergyToday?:         Measurement;
   ConsumedEnergyTotal?:         Measurement;
   Date?:                        string;
@@ -132,6 +134,7 @@ export type RealTimeData = {
   PV2Power?:                    Measurement;
   PV2Voltage?:                  Measurement;
   PVEnergyTotal?:               Measurement;
+  PVETodayYield?:               Measurement;
   RadiatorTemperature?:         Measurement;
   RadiatorTemperatureInner?:    Measurement;
   RunMode?:                     Measurement;

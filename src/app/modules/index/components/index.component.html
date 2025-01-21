@@ -1,6 +1,6 @@
 @if (dataSg(); as data) {
   <h1>{{data.Live.PVESystemName}}</h1>
-  <p class="index-data.Live-date">
+  <p>
     {{data.Live.Date ? (data.Live.Date|dateTime:'FF') : ' '}}
   </p>
   <div class="index-overview">
@@ -44,6 +44,7 @@
         <text x="25" y="180" text-anchor="end">P = </text><text x="90" y="180" text-anchor="end" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.value|number:'1.1-1':language}}</text><text x="95" y="180" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.unit}}</text>
         <text x="25" y="310" text-anchor="end">C = </text><text x="65" y="310" text-anchor="end">{{data.Live.BatteryRemainingEnergy?.value|number:'1.1-1':language}}</text><text x="70" y="310">{{data.Live.BatteryRemainingEnergy?.unit}}</text>
         <text x="25" y="330" text-anchor="end">T = </text><text x="65" y="330" text-anchor="end">{{data.Live.BatteryTemperature?.value|number:'1.1-1':language}}</text><text x="70" y="330">{{data.Live.BatteryTemperature?.unit}}</text>
+        <text x="2" y="350" text-anchor="start">BMS: <tspan>{{undefined === data.Live.BMSStatus ? '?' : 1 === data.Live.BMSStatus.value ? '✔' : '✖'}}</tspan></text>
         <use href="#flow" x="100" y="230" width="90" height="20" [ngClass]="{'animate': !!data.Live.BatteryPower?.value, 'reverse': 0 < (data.Live.BatteryPower?.value ?? 0)}" />
       </g>
 
@@ -55,7 +56,7 @@
 
       <g id="inverter-block">
         <use href="#inverter" x="200" y="200" width="80" height="80" />
-        <text x="240" y="245" filter="url(#bg-text)" dominant-baseline="middle" text-anchor="middle" font-weight="bold" [ngClass]="{'red': 0 > data.Live.GridPowerTotal.value}">{{data.Live.GridPowerTotal.value}} {{data.Live.GridPowerTotal.unit}}</text>
+        <text x="240" y="245" filter="url(#bg-text)" dominant-baseline="middle" text-anchor="middle" font-weight="bold" [ngClass]="{'red': 0 > (data.Live.ACPowerTotal?.value ?? 0)}">{{data.Live.ACPowerTotal?.value}} {{data.Live.ACPowerTotal?.unit}}</text>
         <g>
           <title>{{'IndexSVGRadiatorTemperature'|translate}}</title>
           <text x="230" y="200" text-anchor="end">T  = <tspan dx="-22" dy="4">o</tspan></text>
@@ -82,7 +83,7 @@
           <title>{{'IndexSVGReserverPower'|translate}}</title>
           <text x="410" y="180" text-anchor="end">P  = <tspan dx="-22" dy="4">r</tspan></text><text x="445" y="180" text-anchor="end">{{(data.Live.ReservedPower.value * 0.001)|number:'1.1-1':language}}</text><text x="450" y="180">k{{data.Live.ReservedPower.unit}}</text>
         </g>
-        <text x="420" y="310" class="percentage" text-anchor="right">{{data.Live.LoadPercent.value|number:'1.1-1':language}} {{data.Live.LoadPercent.unit}}</text>
+        <text x="420" y="310" class="smaller" text-anchor="right">{{data.Live.LoadPercent.value|number:'1.1-1':language}} {{data.Live.LoadPercent.unit}}</text>
         <use href="#flow" x="290" y="230" width="90" height="20" [ngClass]="{'animate': !!data.Live.LoadPower?.value, 'reverse': 0 > (data.Live.LoadPower?.value ?? 0)}" />
       </g>
 
@@ -100,7 +101,8 @@
         <text x="330" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="20" text-anchor="end">{{data.Live.PV2Voltage?.value|number:'1.1-1':language}}</text><text x="395" y="20">{{data.Live.PV2Voltage?.unit}}</text>
         <text x="330" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="40" text-anchor="end">{{data.Live.PV2Current?.value|number:'1.1-1':language}}</text><text x="395" y="40">{{data.Live.PV2Current?.unit}}</text>
         <text x="330" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="60" text-anchor="end">{{data.Live.PV2Power?.value|number:'1.1-1':language}}</text><text x="395" y="60">{{data.Live.PV2Power?.unit}}</text>
-        <text x="280" y="100" class="percentage" text-anchor="start">{{data.Live.PVETotalPercent.value|number:'1.1-1':language}} {{data.Live.PVETotalPercent.unit}}</text>
+        <text x="200" y="100" class="smaller" text-anchor="end">P = {{data.Live.PVETodayYield?.value|number:'1.1-1':language}} {{data.Live.PVETodayYield?.unit}}</text>
+        <text x="280" y="100" class="smaller" text-anchor="start">{{data.Live.PVETotalPercent.value|number:'1.1-1':language}} {{data.Live.PVETotalPercent.unit}}</text>
         <use href="#flow" x="195" y="135" width="90" height="20" transform="rotate(90 240 145)" [ngClass]="{'animate': 0 < data.Live.PVETotal.value}" />
       </g>
     </svg>
