@@ -16,9 +16,9 @@ It is also necessary to add repeated script execution, e.g. using cron. The foll
 
 ```plaintext
 # Solax Triggers
-   44    23  *  *  *  wget -q -t 3 -T 900 -O /dev/null 'http://[vase-domena]/api/parser.php?1' > /dev/null
-29,59     *  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/trigger.php?verbose=1' > /dev/null
-   35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[vase-domena]/api/charger.php' > /dev/null
+   44    23  *  *  *  wget -q -t 3 -T 900 -O /dev/null 'http://[your-domain]/api/parser.php?1' > /dev/null
+29,59     *  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[your-domain]/api/trigger.php?verbose=1' > /dev/null
+   35 19,20  *  *  *  wget -q -t 1 -T 300 -O /dev/null 'http://[your-domain]/api/charger.php' > /dev/null
 ```
 
 If everything is set up correctly, you can run the application on your domain. It is necessary to set up communication between the application and the WIFI dongle in the "Settings" tab. These are mainly the items "Dongle WIFI identifier" and "IP address". These are mandatory items for communication with the inverter.
