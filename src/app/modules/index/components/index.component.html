@@ -42,9 +42,9 @@
         <text x="25" y="140" text-anchor="end">U = </text><text x="90" y="140" text-anchor="end">{{data.Live.BatteryVoltage?.value|number:'1.1-1':language}}</text><text x="95" y="140">{{data.Live.BatteryVoltage?.unit}}</text>
         <text x="25" y="160" text-anchor="end">I = </text><text x="90" y="160" text-anchor="end">{{data.Live.BatteryCurrent?.value|number:'1.1-1':language}}</text><text x="95" y="160">{{data.Live.BatteryCurrent?.unit}}</text>
         <text x="25" y="180" text-anchor="end">P = </text><text x="90" y="180" text-anchor="end" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.value|number:'1.1-1':language}}</text><text x="95" y="180" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.unit}}</text>
-        <text x="25" y="310" text-anchor="end">C = </text><text x="65" y="310" text-anchor="end">{{data.Live.BatteryRemainingEnergy?.value|number:'1.1-1':language}}</text><text x="70" y="310">{{data.Live.BatteryRemainingEnergy?.unit}}</text>
+        <text x="25" y="310" text-anchor="end">E = </text><text x="65" y="310" text-anchor="end">{{data.Live.BatteryRemainingEnergy?.value|number:'1.1-1':language}}</text><text x="70" y="310">{{data.Live.BatteryRemainingEnergy?.unit}}</text>
         <text x="25" y="330" text-anchor="end">T = </text><text x="65" y="330" text-anchor="end">{{data.Live.BatteryTemperature?.value|number:'1.1-1':language}}</text><text x="70" y="330">{{data.Live.BatteryTemperature?.unit}}</text>
-        <text x="2" y="350" text-anchor="start">BMS: <tspan>{{undefined === data.Live.BMSStatus ? '?' : 1 === data.Live.BMSStatus.value ? '✔' : '✖'}}</tspan></text>
+        <text x="2" y="350" text-anchor="start">BMS: {{undefined === data.Live.BMSStatus ? '?' : 1 === data.Live.BMSStatus.value ? '✔' : '✖'}}</text>
         <use href="#flow" x="100" y="230" width="90" height="20" [ngClass]="{'animate': !!data.Live.BatteryPower?.value, 'reverse': 0 < (data.Live.BatteryPower?.value ?? 0)}" />
       </g>
 
@@ -101,7 +101,7 @@
         <text x="330" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="20" text-anchor="end">{{data.Live.PV2Voltage?.value|number:'1.1-1':language}}</text><text x="395" y="20">{{data.Live.PV2Voltage?.unit}}</text>
         <text x="330" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="40" text-anchor="end">{{data.Live.PV2Current?.value|number:'1.1-1':language}}</text><text x="395" y="40">{{data.Live.PV2Current?.unit}}</text>
         <text x="330" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="60" text-anchor="end">{{data.Live.PV2Power?.value|number:'1.1-1':language}}</text><text x="395" y="60">{{data.Live.PV2Power?.unit}}</text>
-        <text x="200" y="100" class="smaller" text-anchor="end">P = {{data.Live.PVETodayYield?.value|number:'1.1-1':language}} {{data.Live.PVETodayYield?.unit}}</text>
+        <text x="200" y="100" class="smaller" text-anchor="end">E = {{data.Live.PVETodayYield?.value|number:'1.1-1':language}} {{data.Live.PVETodayYield?.unit}}</text>
         <text x="280" y="100" class="smaller" text-anchor="start">{{data.Live.PVETotalPercent.value|number:'1.1-1':language}} {{data.Live.PVETotalPercent.unit}}</text>
         <use href="#flow" x="195" y="135" width="90" height="20" transform="rotate(90 240 145)" [ngClass]="{'animate': 0 < data.Live.PVETotal.value}" />
       </g>
