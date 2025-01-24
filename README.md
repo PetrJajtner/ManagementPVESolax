@@ -8,9 +8,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ### Installation
 
-The entire application is delivered in source code so that the user/programmer can build the application themselves or adapt it to his/her needs. It is necessary to have a web server ready, e.g. Apache and PHP. The installation procedure for Apache or PHP is not the subject of this readme.
+The entire application is delivered in source code so that the user/programmer can build the application themselves or adapt it to his/her needs. It is necessary to have a web server ready, e.g. Apache (v. 2.4.59) and PHP (v. 7.3.31). The installation procedure for Apache or PHP is not the subject of this readme.
 
-We will copy the contents of the `/dist` folder to the root folder of the website. Then we will change the permissions of the `/api/data` directory to write and read by Apache or PHP. Files with OTE prices, charging, output from the launcher and settings will be written to this directory.
+We will copy the contents of the `/dist` folder to the root folder of the website. Then we will change the permissions of the `/api/data` directory to write and read by Apache or PHP. Files with OTE (OTE = "Operátor trhu s elektřinou"; Electricity Market Operator) prices, charging, output from the launcher and settings will be written to this directory.
 
 It is also necessary to add repeated script execution, e.g. using cron. The following lines must be added to the launcher configuration:
 
@@ -46,9 +46,9 @@ SOFTWARE JE POSKYTOVÁN "TAK, JAK JE", BEZ JAKÉKOLI ZÁRUKY, AŤ VÝSLOVNÉ NEB
 
 ### Instalace
 
-Celá aplikace je dodávána ve zdrojových kódech, aby měl uživatel/programátor možnost si aplikaci sám sestavit, případně přizpůsobit svým potřebám. Je potřeba mít přichystán webový server, např. Apache a PHP. Postup instalace Apache nebo PHP není předmětem tohoto readme.
+Celá aplikace je dodávána ve zdrojových kódech, aby měl uživatel/programátor možnost si aplikaci sám sestavit, případně přizpůsobit svým potřebám. Je potřeba mít přichystán webový server, např. Apache (v. 2.4.59) a PHP (v. 7.3.31). Postup instalace Apache nebo PHP není předmětem tohoto readme.
 
-Do kořenové složky rootu webu nakopírujeme obsah složky `/dist`. Následně změníme práva adresáře `/api/data` zápis a čtení Apachem, resp. PHP. Do tohoto adresáře se budou zapisovat soubory s cenami OTE, nabíjením, výstupem ze spouštěče a nastavením.
+Do kořenové složky rootu webu nakopírujeme obsah složky `/dist`. Následně změníme práva adresáře `/api/data` zápis a čtení Apachem, resp. PHP. Do tohoto adresáře se budou zapisovat soubory s cenami OTE (OTE = „Operátor trhu s elektřinou“), nabíjením, výstupem ze spouštěče a nastavením.
 
 Dále je nutné doplnit pravidelné spouštění skriptů, např. pomocí cronu. Do konfigurace spouštěče je nutné doplnit tyto řádky:
 
