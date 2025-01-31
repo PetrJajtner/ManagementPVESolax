@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@a
 import { FormControl, FormGroup } from '@angular/forms';
 import { BIAS_MODES, MANUAL_MODES, WORKING_MODES } from '@app/models/pve.model';
 import { ERROR_MAP, RegistryType, SettingsType } from '@app/models/settings.model';
-import { ConfigService } from '@app/services/config.service';
+import { ConfigService, THEME_DARK, THEME_LIGHT, Theme } from '@app/services/config.service';
 import { I18nService } from '@app/services/i18n.service';
 import { RegistryForm, SettingsForm, SettingsService } from '@app/services/settings.service';
 
@@ -50,6 +50,15 @@ export class IndexComponent {
   private __appLanguages: {label: string; value: string}[] = this.__configSrv.availableLanguages.map((language) => {
     return {label: language, value: language};
   });
+
+  /**
+   * Seznam barevnych temat
+   */
+  private __appThemes: {label: string; value: string}[] = [
+    {label: 'SettingsThemeSystem', value: ''},
+    {label: 'SettingsThemeLight',  value: THEME_LIGHT},
+    {label: 'SettingsThemeDark',   value: THEME_DARK}
+  ];
 
   /**
    * Signal mesicu
@@ -109,7 +118,28 @@ export class IndexComponent {
   }
 
   /**
-   * Rezimy ovlivneni
+   * Getter ulozeneho barevneho tematu
+   */
+  public get appTheme(): string {
+    return this.__configSrv.storedThemeSg() ?? '';
+  }
+
+  /**
+   * Setter ulozeneho barevneho tematu
+   */
+  public set appTheme(value: string) {
+    this.__configSrv.storedThemeSg.set((value.trim() || undefined) as Theme | undefined);
+  }
+
+  /**
+   * Getter seznamu barevnych temat
+   */
+  public get appThemes(): {label: string; value: string}[] {
+    return this.__appThemes;
+  }
+
+  /**
+   * Getter rezimu ovlivneni
    */
   public get biasModes(): readonly string[] {
     return BIAS_MODES;
@@ -130,14 +160,14 @@ export class IndexComponent {
   }
 
   /**
-   * Rezimy nuceneho nabijeni/vybijeni v manualnim rezimu
+   * Getter rezimu nuceneho nabijeni/vybijeni v manualnim rezimu
    */
   public get manualModes(): readonly string[] {
     return MANUAL_MODES;
   }
 
   /**
-   * Pracovni rezimy stridace
+   * Getter pracovnich rezimu stridace
    */
   public get workingModes(): readonly string[] {
     return WORKING_MODES;

@@ -1,7 +1,7 @@
 <h1>{{'Settings'|translate}}</h1>
-@if (0 < appLanguages.length) {
-  <fieldset>
-    <legend>{{'SettingsApplication'|translate}}</legend>
+<fieldset>
+  <legend>{{'SettingsApplication'|translate}}</legend>
+  @if (0 < appLanguages.length) {
     @if (1 === appLanguages.length) {
       <p>
         <strong>{{'SettingsLanguage'|translate}}:</strong>
@@ -19,8 +19,18 @@
         </select>
       </p>
     }
-  </fieldset>
-}
+  }
+  <p>
+    <label for="theme">{{'SettingsTheme'|translate}}:</label>
+    <select [(ngModel)]="appTheme"
+            id="theme"
+            name="theme">
+      @for (option of appThemes; track $index) {
+        <option [attr.value]="option.value">{{option.label|translate}}</option>
+      }
+    </select>
+  </p>
+</fieldset>
 
 @if (dataSg(); as data) {
   <fieldset>

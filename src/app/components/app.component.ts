@@ -1,6 +1,6 @@
 import {
-  ChangeDetectionStrategy, Component, ElementRef, Signal, computed, effect,
-  inject, signal
+  ChangeDetectionStrategy, Component, ElementRef, HostBinding, Signal, computed,
+  effect, inject, signal
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -10,7 +10,7 @@ import {
 import { APPLICATION_NAME } from '@app/app.settings';
 import { API } from '@app/models/urls.model';
 import { isObject } from '@app/models/utils.model';
-import { ConfigService } from '@app/services/config.service';
+import { ConfigService, Theme } from '@app/services/config.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Menu, MenuService } from '@app/services/menu.service';
 import { WaitService } from '@app/services/wait.service';
@@ -148,6 +148,22 @@ export class AppComponent {
   }
 
   /**
+   * Getter barevneho tematu
+   */
+  @HostBinding('class')
+  public get theme(): Theme {
+    return this.__configSrv.themeSg();
+  }
+
+  /**
+   * Getter priznaku vyckavaci
+   */
+  @HostBinding(`class.${CSS_CLASS_WAIT}`)
+  public get wait(): boolean {
+    return this.__waitSrv.waitSg();
+  }
+
+  /**
    * Konstruktor
    */
   public constructor() {
@@ -165,19 +181,6 @@ export class AppComponent {
     effect(() => {
       const config = this.__configSrv.configSg();
       config?.DataServerUrl && (API.Path = config.DataServerUrl);
-    });
-
-    /**
-     * Zaktualizuje tridu tela
-     */
-    effect(() => {
-      const wait = this.__waitSrv.waitSg();
-      if (wait && !this.__body.classList.contains(CSS_CLASS_WAIT)) {
-        this.__body.classList.add(CSS_CLASS_WAIT);
-      }
-      if (!wait && this.__body.classList.contains(CSS_CLASS_WAIT)) {
-        this.__body.classList.remove(CSS_CLASS_WAIT);
-      }
     });
 
     /**

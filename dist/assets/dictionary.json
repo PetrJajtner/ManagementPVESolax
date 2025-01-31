@@ -498,6 +498,22 @@
     "cs": "Otestovat spojení",
     "en": "Test connection"
   },
+  "SettingsTheme": {
+    "cs": "Barevné schéma",
+    "en": "Color theme"
+  },
+  "SettingsThemeDark": {
+    "cs": "tmavé",
+    "en": "dark"
+  },
+  "SettingsThemeLight": {
+    "cs": "světlé",
+    "en": "light"
+  },
+  "SettingsThemeSystem": {
+    "cs": "systémové",
+    "en": "system"
+  },
   "SettingsThreshold": {
     "cs": "Min. výkupní cena",
     "en": "Min. purchase price"

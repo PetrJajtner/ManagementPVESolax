@@ -1,7 +1,24 @@
-import { Injectable, Signal, WritableSignal, inject, signal } from '@angular/core';
+import { Injectable, Signal, WritableSignal, effect, inject, signal } from '@angular/core';
+import { COMMON_CONFIG_SRV_THEME } from '@app/models/keys.model';
 import { API, JSON_CONFIG } from '@app/models/urls.model';
 import { isArray, logException } from '@app/models/utils.model';
+import { StorageService } from '@app/services/storage.service';
 import { WaitService } from '@app/services/wait.service';
+
+/**
+ * Tmave barevne tema
+ */
+export const THEME_DARK = 'theme-dark';
+
+/**
+ * Tmave barevne tema
+ */
+export const THEME_LIGHT = 'theme-light';
+
+/**
+ * Typ pro barevne tema
+ */
+export type Theme = typeof THEME_DARK | typeof THEME_LIGHT;
 
 /**
  * Konfiguracni data
@@ -21,6 +38,11 @@ export type Config = {
   providedIn: 'root'
 })
 export class ConfigService {
+
+  /**
+   * Sluzba pro ukladani dat do lokalniho uloziste
+   */
+  private __storageSrv: StorageService = inject(StorageService);
 
   /**
    * Sluzba pro vyckavani
@@ -99,6 +121,50 @@ export class ConfigService {
   });
 
   /**
+   * Signal ulozeneho barevneho tematu
+   */
+  private __storedThemeSg: WritableSignal<Theme | undefined> = (() => {
+    let defaultTheme = this.__storageSrv.getValue<Theme>(COMMON_CONFIG_SRV_THEME);
+    const storedThemeSg = signal<Theme | undefined>(defaultTheme);
+
+    effect(() => {
+      const storedTheme = storedThemeSg();
+      if (storedTheme !== defaultTheme) {
+        defaultTheme = storedTheme;
+        if (undefined !== defaultTheme) {
+          this.__storageSrv.setValue(COMMON_CONFIG_SRV_THEME, defaultTheme);
+        } else {
+          this.__storageSrv.removeKey(COMMON_CONFIG_SRV_THEME);
+        }
+      }
+    });
+
+    return storedThemeSg;
+  })();
+
+  /**
+   * Signal barevneho schematu
+   */
+  private __themeSg: Signal<Theme> = (() => {
+    const
+      mediaQuery = window.matchMedia('(prefers-color-scheme: dark)'),
+      queryThemeSg = signal<Theme>(mediaQuery.matches ? THEME_DARK : THEME_LIGHT),
+      themeSg = signal<Theme>(THEME_LIGHT as Theme)
+    ;
+
+    mediaQuery.addEventListener('change', (event: MediaQueryListEvent) => {
+      queryThemeSg.set(event.matches ? THEME_DARK : THEME_LIGHT);
+    });
+
+    effect(() => {
+      const storedTheme = this.__storedThemeSg();
+      themeSg.set(undefined === storedTheme ? queryThemeSg() : storedTheme);
+    });
+
+    return themeSg.asReadonly();
+  })();
+
+  /**
    * Casova zona
    */
   private __timezone: string = 'Europe/Prague';
@@ -137,6 +203,20 @@ export class ConfigService {
    */
   public get defaultLanguage(): string {
     return this.__defaultLanguage;
+  }
+
+  /**
+   * Getter zapisovatelneho signalu ulozeneho barevneho tematu
+   */
+  public get storedThemeSg(): WritableSignal<Theme | undefined> {
+    return this.__storedThemeSg;
+  }
+
+  /**
+   * Getter signalu barevneho tematu
+   */
+  public get themeSg(): Signal<Theme> {
+    return this.__themeSg;
   }
 
   /**

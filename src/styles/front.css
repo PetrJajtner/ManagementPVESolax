@@ -1,41 +1,55 @@
-:root {
-  --bg-color: #fff;
-}
 a,
 .link-like {
-  color: #f7b61e;
+  color: var(--color-active, #fc0);
   cursor: pointer;
   text-decoration: none;
 }
 body {
-  background-color: var(--bg-color, #fff);
-  color: #000;
+  background-color: var(--color-background, #fff);
+  color: var(--color-text, #000);
   font-family: var(--font-family);
   font-size: var(--font-size);
 }
 body, html {
   height: 100%;
 }
+body.theme-dark button:not([data-type="submit"], [type="submit"], [disabled]) {
+  background-color: #8d8d8d;
+  border-color: #898989;
+}
+body.theme-dark button:not([data-type="submit"], [type="submit"], [disabled]):hover {
+  background-color: #7e7e7e;
+  border-color: #7b7b7b;
+}
 button {
   border-radius: 0.25rem;
   border-width: 0.0625rem;
   padding: 0.25rem 0.5rem;
 }
-button[data-type="submit"],
-button[type="submit"] {
-  background-color: #0060df;
-  border-color: #e3e3e3;
-  color: #fff;
+button[data-type="submit"]:not([disabled]),
+button[type="submit"]:not([disabled]) {
   appearance: button;
+  background-color: #0060df;
+  border-color: #2080df;
+  border-style: outset;
+  color: #fff;
+}
+button[data-type="submit"]:not([disabled]):hover,
+button[type="submit"]:not([disabled]):hover {
+  background-color: #0050b9;
+  border-color: #0060df;
 }
 button[disabled] {
   background-color: #efefef4d;
   border-color: #7676764d;
   color: #1010104d;
 }
+circle {
+  transition: stroke-dashoffset 1s ease;
+}
 details,
 fieldset {
-  border: 0.0625rem solid #ccc;
+  border: 0.0625rem solid var(--color-frame, #ccc);
   border-radius: 0.25rem;
   margin-bottom: 0.5rem;
 }
@@ -47,7 +61,7 @@ h1, h2 {
   margin: 0.67em 0 0;
 }
 header {
-  background-color: #4e4d52;
+  background-color: var(--color-header, #4e4d52);
   z-index: 1;
 }
 header nav {
@@ -55,14 +69,22 @@ header nav {
 }
 hr {
   border: 0 none;
-  border-top: 0.0625rem solid #ccc;
+  border-top: 0.0625rem solid var(--color-frame, #ccc);
   margin: 1rem 0;
+}
+input[type="number"],
+input[type="text"] {
+  appearance: textfield;
 }
 input[type="number"],
 input[type="text"],
 select {
+  background-color: var(--color-background, #fff);
+  border-color: var(--color-border, #e3e3e3);
+  border-radius: 0.25rem;
+  border-style: inset;
   border-width: 0.0625rem;
-  border-radius: 0.125rem;
+  color: var(--color-text, #000);
   height: 1.5rem;
   padding: 0 0.125rem 0 0.25rem;
 }
@@ -100,41 +122,48 @@ main {
   margin: 0.5rem;
 }
 summary {
-  background-color: var(--bg-color, #fff);
+  background-color: var(--color-background, #fff);
   margin: -0.875rem 0 0.5rem;
   white-space: nowrap;
   width: min-content;
 }
 table {
-  border: 0.0625rem solid black;
+  background-color: var(--color-table-cell-odd, #e4e4e4);
+  border: 0.0625rem solid var(--color-table-border, #000);
   border-collapse: collapse;
+}
+table td {
+  background-color: var(--color-background, #fff);
+  color: var(--color-table-cell-tx, #000);
 }
 table td,
 table th {
-  background-color: white;
   font-variant-numeric: tabular-nums;
   padding: 0.125rem 0.375rem;
   white-space: nowrap;
 }
 table th {
-  background-color: #666;
-  color: #fff;
+  background-color: var(--color-table-header-bg, #666);
+  color: var(--color-table-header-tx, #fff);
 }
 table tbody th,
 table thead th:first-child {
   text-align: left;
 }
 table tr:nth-child(2n-1) td {
-  background-color: #e4e4e4;
+  background-color: var(--color-table-cell-even, #e4e4e4);
 }
 table tr:nth-child(2n) td {
-  background-color: #fafafa;
+  background-color: var(--color-table-cell-odd, #fafafa);
 }
 text tspan {
   font-size: 0.75em;
 }
+text {
+  fill: var(--color-text, #000);
+}
 text.red {
-  fill: red;
+  fill: var(--color-red, #f00);
 }
 use[href="#flow"].animate {
   --animation: flow;
@@ -152,14 +181,21 @@ use[href="#flow"].animate.reverse {
   user-select: none;
 }
 
+.color-allow {
+  color: var(--color-allow);
+}
+.color-disallow {
+  color: var(--color-disallow);
+}
 .error {
-  color: #f00;
+  color: var(--color-red, #f00);
   display: inline-block;
   font-size: 0.75rem;
   padding: 0 0.25rem;
 }
 .flow-dot {
   animation: var(--animation, none) 1.5s linear infinite;
+  fill: var(--color-active, #f7b61e);
   opacity: 0;
 }
 .help fieldset p strong {
@@ -171,7 +207,7 @@ use[href="#flow"].animate.reverse {
   text-align: center;
 }
 .index-market-prices {
-  border: 0.0625rem solid black;
+  border: 0.0625rem solid var(--color-table-border, #000);
   display: inline-block;
   margin-bottom: 0.5rem;
   max-width: 100%;
@@ -194,13 +230,13 @@ use[href="#flow"].animate.reverse {
   position: sticky;
 }
 .index-market-prices tr:nth-child(2n-1) td.current-hour {
-  background-color: rgba(247, 182, 30, 0.66);
+  background-color: var(--color-active-odd, #f7b61ea8);
 }
 .index-market-prices tr:nth-child(2n) td.current-hour {
-  background-color: rgba(247, 182, 30, 0.33);
+  background-color: var(--color-active-even, #f7b61e54);
 }
 .index-market-prices th.current-hour {
-  color: #f7b61e;
+  color: var(--color-active, #f7b61e);
 }
 .index-measurements {
   display: flex;
@@ -249,7 +285,23 @@ use[href="#flow"].animate.reverse {
   text-decoration: underline;
 }
 .menu-list__item-link--active {
-  color: #f7b61e;
+  color: var(--color-active, #fc0);
+}
+.progress-bg {
+  stroke: var(--color-progress, #ddd);
+}
+.progress-charged {
+  stroke: var(--color-green, #0f0);
+}
+.progress-discharged {
+  stroke: var(--color-red, #f00);
+}
+.progress-load {
+  stroke: var(--color-fuchsia, #f0f);
+}
+.progress-panels,
+.progress-warning {
+  stroke: var(--color-gold, #ffd700);
 }
 .smaller {
   fill: #808080;
@@ -261,16 +313,22 @@ use[href="#flow"].animate.reverse {
 }
 .wait:before {
   background-color: #0004;
+  bottom: 0;
   content: '';
   cursor: wait;
   display: flex;
   flex: 1 1 auto;
-  height: 100%;
   left: 0;
   position: absolute;
+  right: 0;
   top: 0;
   width: 100%;
   z-index: 10000;
+}
+
+#bg-text feFlood {
+  flood-color: var(--color-background, #fff);
+  flood-opacity: var(--graphic-opacity, 0.85);
 }
 
 @keyframes flow {

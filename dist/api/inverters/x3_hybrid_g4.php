@@ -157,13 +157,13 @@ class X3HybridG4 extends SolaXInverter {
 
       $value = 0;
       $manipulation = self::SENSORS[$key];
-      if (is_numeric($manipulation[0])) {
+      if (is_numeric($manipulation[0]) && array_key_exists($manipulation[0], $data)) {
         $value = $data[$manipulation[0]];
       }
       if (is_array($manipulation[0])) {
         $values = array();
         foreach ($manipulation[0] as $index => $sensorKey) {
-          $values[$index] = $data[$sensorKey];
+          $values[$index] = array_key_exists($sensorKey, $data) ? $data[$sensorKey] : 0;
         }
         $value = $this->_packU16(...$values);
       }
