@@ -1,20 +1,12 @@
-import { registerLocaleData } from '@angular/common';
-import { Injectable, Signal, WritableSignal, computed, inject, signal } from '@angular/core';
+import {
+  Injectable, Signal, WritableSignal, computed, inject, isDevMode, signal
+} from '@angular/core';
 import { COMMON_I18N_SRV_LANGUAGE } from '@app/models/keys.model';
-import { JSON_DICTIONARY, JSON_LOCALES_CONFIG } from '@app/models/urls.model';
-import { isFunction, logException } from '@app/models/utils.model';
+import { JSON_DICTIONARY } from '@app/models/urls.model';
+import { logException } from '@app/models/utils.model';
 import { WaitService } from '@app/services//wait.service';
 import { ConfigService } from '@app/services/config.service';
 import { StorageService } from '@app/services/storage.service';
-import { environment } from '@env/environment';
-import { Settings } from 'luxon';
-
-/**
- * Soubory se slovniky
- */
-export const DICTIONARY_FILES: readonly string[] = Object.freeze([
-  JSON_DICTIONARY
-]);
 
 /**
  * Typ pro slovnik
@@ -30,31 +22,6 @@ export type Translation = Record<string, string>;
  * Typ vlastnosti pro Proxy
  */
 export type ProxyProperty = string | number | symbol;
-
-/**
- * Prevede hodnotu na JSON s moznosti kodovani funkci
- */
-export function buildFnJSON(value: unknown): string {
-  return JSON.stringify(value, (key: string, value: any) => {
-    return (isFunction(value) ? `${value.toString()}` : value) as string;
-  });
-}
-
-/**
- * Znormalizuje lokalizacni klic
- */
-export function normalizeLocale(locale: string): string {
-  return locale.toLowerCase().replace(/_/g, '-');
-}
-
-/**
- * Prevede JSON na hodnotu s moznosti dekodovani funkci
- */
-export function parseFnJSON(value: string): unknown {
-  return JSON.parse(value, (key: string, value: unknown) => {
-    return ('string' === typeof value && value.startsWith('function')) ? (new Function(`return (${value});`))() as unknown : value;
-  });
-}
 
 /**
  * Sluzba zajistujici lokalizaci aplikace
@@ -97,21 +64,13 @@ export class I18nService {
       this.__waitSrv.wait = true;
       try {
         const
-          getJSON = async <T extends Dictionary>(url: string) => {
-            return await ((await fetch(url)).json()) as T;
-          },
-          getText = async <T extends string>(url: string) => {
-            return await ((await fetch(url)).text()) as T;
-          },
-          dictionary = (await Promise.all(DICTIONARY_FILES.map((url: string) => getJSON(url)))).reduce((acc: Dictionary, data: Dictionary) => {
-            return {...acc, ...data};
-          }, {} as Dictionary),
-          locales = parseFnJSON(await getText(JSON_LOCALES_CONFIG)) as any[]
+          response = await fetch(JSON_DICTIONARY),
+          dictionary = await response.json() as Dictionary
         ;
-        for (const locale of locales) {
-          registerLocaleData(locale);
-        }
+
+        this.__setLanguage(this.__storageSrv.getValue<string>(COMMON_I18N_SRV_LANGUAGE, this.__configSrv.defaultLanguage) as string);
         this.__dictionarySg.set(this.__dictionary = dictionary);
+
         resolve(this.__dictionary);
       } catch (error) {
         logException('/app/services/I18nService::__promise', error);
@@ -124,9 +83,7 @@ export class I18nService {
   /**
    * Signal aktualniho jazyka aplikace
    */
-  private __languageSg: WritableSignal<string> = signal<string>(
-    this.__storageSrv.getValue<string>(COMMON_I18N_SRV_LANGUAGE, this.__configSrv.defaultLanguage) as string
-  );
+  private __languageSg: WritableSignal<string> = signal<string>(this.__configSrv.defaultLanguage);
 
   /**
    * Signal dostupnych jazyku
@@ -199,13 +156,6 @@ export class I18nService {
   }
 
   /**
-   * Konstruktor
-   */
-  public constructor() {
-    this.__setLanguage();
-  }
-
-  /**
    * Formatovani parametru do prekladu
    */
   public format(translationKey: string, ...param: unknown[]): string {
@@ -274,14 +224,13 @@ export class I18nService {
       this.__languageSg.set(language);
     }
     document.documentElement.lang = language;
-    Settings.defaultLocale = language;
   }
 
   /**
    * Oznaci neprelozeny nebo nerozpoznany preklad
    */
   private __markUnsolved(text: string): string {
-    return environment.production ? text : `!@${text}#`;
+    return isDevMode() ? `!@${text}#` : text;
   }
 
   /**

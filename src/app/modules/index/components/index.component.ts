@@ -4,11 +4,9 @@ import {
 } from '@angular/core';
 import { PriceType, PricesType } from '@app/models/prices.model';
 import { LiveData, MANUAL_MODES, Measurement } from '@app/models/pve.model';
-import { I18nService } from '@app/services/i18n.service';
 import { LiveDataService } from '@app/services/live-data.service';
 import { PricesService } from '@app/services/prices.service';
 import { DEFAULT_SETTINGS, SettingsService } from '@app/services/settings.service';
-import { DateTime } from 'luxon';
 
 /**
  * Nasobek ceny za kWh
@@ -58,11 +56,6 @@ export class IndexComponent {
    * Reference na destruktor
    */
   private __destroyRef: DestroyRef = inject(DestroyRef);
-
-  /**
-   * Sluzba zajistujici lokalizaci aplikace
-   */
-  private __i18nSrv: I18nService = inject(I18nService);
 
   /**
    * Sluzba pro cteni zivych dat z FVE
@@ -158,17 +151,16 @@ export class IndexComponent {
   private __dataSg: Signal<ComponentData> = computed(() => {
     const
       live = this.__extendedLiveDataSg(),
-      prices = this.__pricesSg(),
-      date = live.Date ? DateTime.fromISO(live.Date) : undefined
+      prices = this.__pricesSg()
     ;
 
     let
       hour = this.__currentHour,
       isSameDate = true
     ;
-    if (prices && date) {
-      isSameDate = date.toISODate() === prices.Date;
-      hour = isSameDate ? date.hour : -1;
+    if (prices && prices.Date && live.Date) {
+      isSameDate = live.Date.includes(prices.Date);
+      hour = isSameDate ? (new Date(live.Date)).getHours() : -1;
     }
     if (prices && this.__currentHour !== hour) {
       this.__currentHour = hour;
@@ -183,13 +175,6 @@ export class IndexComponent {
    */
   public get dataSg(): Signal<ComponentData> {
     return this.__dataSg;
-  }
-
-  /**
-   * Getter aktualniho jazyka
-   */
-  public get language(): string {
-    return this.__i18nSrv.language;
   }
 
   /**

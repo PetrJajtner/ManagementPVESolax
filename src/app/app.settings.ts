@@ -6,7 +6,7 @@
 /**
  * Staticka konfigurace aplikace
  */
-export const APPLICATION_BUILD   = '27';
-export const APPLICATION_DATE    = '2025-01-28T12:16:21.202Z';
+export const APPLICATION_BUILD   = '28';
+export const APPLICATION_DATE    = '2025-02-11T11:15:26.151Z';
 export const APPLICATION_NAME    = 'solax';
 export const APPLICATION_VERSION = '1.0.19';

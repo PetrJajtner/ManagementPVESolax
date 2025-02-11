@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, ElementRef, HostBinding, Signal, computed,
-  effect, inject, signal
+  effect, inject, isDevMode, signal
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -14,7 +14,6 @@ import { ConfigService, Theme } from '@app/services/config.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Menu, MenuService } from '@app/services/menu.service';
 import { WaitService } from '@app/services/wait.service';
-import { environment } from '@env/environment';
 
 /**
  * CSS trida pro nacitani
@@ -167,10 +166,10 @@ export class AppComponent {
    * Konstruktor
    */
   public constructor() {
-    environment.production && this.__body.removeAttribute('ng-version');
+    !isDevMode() && this.__body.removeAttribute('ng-version');
 
     console.log(
-      '%c Zadrzte! \n%c Tato funkce prohlizece je urcena pro vyvojare. ',
+      '%c Zadržte! / Hold on! \n%c Tato funkce prohlížeče je určena pro vývojáře. / This browser feature is intended for developers. ',
       'color: #f00; font-family: sans-serif; font-size: 28px; font-weight: bold;',
       'color: #666; font-family: sans-serif; font-size: 20px;'
     );

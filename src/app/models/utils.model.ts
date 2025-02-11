@@ -4,8 +4,7 @@
  * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
  * @copyright  Ing. Petr Jajtner 2019 - nyni
  */
-import { environment } from '@env/environment';
-import { DateTime } from 'luxon';
+import { isDevMode } from '@angular/core';
 
 /**
  * Bazovy nazev souboru
@@ -69,13 +68,6 @@ export function isArray<T = any>(x: unknown): x is T[] {
  */
 export function isDate(x: unknown): x is Date {
   return !!x && x instanceof Date;
-}
-
-/**
- * Otestuje, zdali je parametr datem typu Luxon
- */
-export function isDateTime(x: unknown): x is DateTime {
-  return !!x && x instanceof DateTime;
 }
 
 /**
@@ -320,7 +312,7 @@ export function warnOnetime(str: string): void {
  * Debugovaci funkce
  */
 export function $dbg(...data: any[]): void {
-  if (environment.production) {
+  if (!isDevMode()) {
     return;
   }
   if (undefined === ($dbg as any).counter) {

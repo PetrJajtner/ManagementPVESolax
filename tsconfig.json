@@ -28,9 +28,6 @@
       "@app/*": [
         "src/app/*"
       ],
-      "@env/*": [
-        "src/environments/*"
-      ],
       "@help/*": [
         "src/app/modules/help/*"
       ],

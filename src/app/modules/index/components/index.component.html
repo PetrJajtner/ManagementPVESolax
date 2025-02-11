@@ -1,7 +1,7 @@
 @if (dataSg(); as data) {
   <h1>{{data.Live.PVESystemName}}</h1>
   <p>
-    {{data.Live.Date ? (data.Live.Date|dateTime:'FF') : ' '}}
+    {{data.Live.Date ? (data.Live.Date|dateFmt:'medium') : ' '}}
   </p>
   <div class="index-overview">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480">
@@ -39,11 +39,11 @@
         <use href="#progress" x="0" y="190" width="100" height="100" [ngClass]="data.Live.BatteryRemainingCapacity?.value|battery" [ngStyle]="{'--percent': data.Live.BatteryRemainingCapacity?.value ?? 0}" />
         <use href="#battery" x="10" y="200" width="80" height="80" />
         <text x="50" y="245" filter="url(#bg-text)" dominant-baseline="middle" text-anchor="middle" font-weight="bold">{{data.Live.BatteryRemainingCapacity?.value}} {{data.Live.BatteryRemainingCapacity?.unit}}</text>
-        <text x="25" y="140" text-anchor="end">U = </text><text x="90" y="140" text-anchor="end">{{data.Live.BatteryVoltage?.value|number:'1.1-1':language}}</text><text x="95" y="140">{{data.Live.BatteryVoltage?.unit}}</text>
-        <text x="25" y="160" text-anchor="end">I = </text><text x="90" y="160" text-anchor="end">{{data.Live.BatteryCurrent?.value|number:'1.1-1':language}}</text><text x="95" y="160">{{data.Live.BatteryCurrent?.unit}}</text>
-        <text x="25" y="180" text-anchor="end">P = </text><text x="90" y="180" text-anchor="end" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.value|number:'1.1-1':language}}</text><text x="95" y="180" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.unit}}</text>
-        <text x="25" y="310" text-anchor="end">E = </text><text x="65" y="310" text-anchor="end">{{data.Live.BatteryRemainingEnergy?.value|number:'1.1-1':language}}</text><text x="70" y="310">{{data.Live.BatteryRemainingEnergy?.unit}}</text>
-        <text x="25" y="330" text-anchor="end">T = </text><text x="65" y="330" text-anchor="end">{{data.Live.BatteryTemperature?.value|number:'1.1-1':language}}</text><text x="70" y="330">{{data.Live.BatteryTemperature?.unit}}</text>
+        <text x="25" y="140" text-anchor="end">U = </text><text x="90" y="140" text-anchor="end">{{data.Live.BatteryVoltage?.value|numberFmt:'1.1-1'}}</text><text x="95" y="140">{{data.Live.BatteryVoltage?.unit}}</text>
+        <text x="25" y="160" text-anchor="end">I = </text><text x="90" y="160" text-anchor="end">{{data.Live.BatteryCurrent?.value|numberFmt:'1.1-1'}}</text><text x="95" y="160">{{data.Live.BatteryCurrent?.unit}}</text>
+        <text x="25" y="180" text-anchor="end">P = </text><text x="90" y="180" text-anchor="end" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.value|numberFmt:'1.1-1'}}</text><text x="95" y="180" [ngClass]="{'red': 0 > (data.Live.BatteryPower?.value ?? 0)}">{{data.Live.BatteryPower?.unit}}</text>
+        <text x="25" y="310" text-anchor="end">E = </text><text x="65" y="310" text-anchor="end">{{data.Live.BatteryRemainingEnergy?.value|numberFmt:'1.1-1'}}</text><text x="70" y="310">{{data.Live.BatteryRemainingEnergy?.unit}}</text>
+        <text x="25" y="330" text-anchor="end">T = </text><text x="65" y="330" text-anchor="end">{{data.Live.BatteryTemperature?.value|numberFmt:'1.1-1'}}</text><text x="70" y="330">{{data.Live.BatteryTemperature?.unit}}</text>
         <text x="2" y="350" text-anchor="start">BMS: {{undefined === data.Live.BMSStatus ? '?' : 1 === data.Live.BMSStatus.value ? '✔' : '✖'}}</text>
         <use href="#flow" x="100" y="230" width="90" height="20" [ngClass]="{'animate': !!data.Live.BatteryPower?.value, 'reverse': 0 < (data.Live.BatteryPower?.value ?? 0)}" />
       </g>
@@ -60,20 +60,20 @@
         <g>
           <title>{{'IndexSVGRadiatorTemperature'|translate}}</title>
           <text x="230" y="200" text-anchor="end">T  = <tspan dx="-22" dy="4">o</tspan></text>
-          <text x="260" y="200" text-anchor="end">{{data.Live.RadiatorTemperature?.value|number:'1.1-1':language}}</text>
+          <text x="260" y="200" text-anchor="end">{{data.Live.RadiatorTemperature?.value|numberFmt:'1.1-1'}}</text>
           <text x="265" y="200">{{data.Live.RadiatorTemperature?.unit}}</text>
         </g>
         <g>
           <title>{{'IndexSVGRadiatorTemperatureInner'|translate}}</title>
           <text x="230" y="290" text-anchor="end">T  = <tspan dx="-20" dy="4">i</tspan></text>
-          <text x="260" y="290" text-anchor="end">{{data.Live.RadiatorTemperatureInner?.value|number:'1.1-1':language}}</text>
+          <text x="260" y="290" text-anchor="end">{{data.Live.RadiatorTemperatureInner?.value|numberFmt:'1.1-1'}}</text>
           <text x="265" y="290">{{data.Live.RadiatorTemperatureInner?.unit}}</text>
         </g>
       </g>
 
       <g id="load-block">
         <g>
-          <title>{{data.Live.LoadPercent.value|number:'1.1-1':language}} {{data.Live.LoadPercent.unit}}</title>
+          <title>{{data.Live.LoadPercent.value|numberFmt:'1.1-1'}} {{data.Live.LoadPercent.unit}}</title>
           <use href="#progress" class="progress-bg" x="380" y="190" width="100" height="100" />
           <use href="#progress" class="progress-load" x="380" y="190" width="100" height="100" [ngStyle]="{'--percent': data.Live.LoadPercent.value}" />
         </g>
@@ -81,28 +81,28 @@
         <text x="430" y="245" filter="url(#bg-text)" dominant-baseline="middle" text-anchor="middle" font-weight="bold" [ngClass]="{'red': 0 > (data.Live.LoadPower?.value ?? 0)}">{{data.Live.LoadPower?.value}} {{data.Live.LoadPower?.unit}}</text>
         <g>
           <title>{{'IndexSVGReserverPower'|translate}}</title>
-          <text x="410" y="180" text-anchor="end">P  = <tspan dx="-22" dy="4">r</tspan></text><text x="445" y="180" text-anchor="end">{{(data.Live.ReservedPower.value * 0.001)|number:'1.1-1':language}}</text><text x="450" y="180">k{{data.Live.ReservedPower.unit}}</text>
+          <text x="410" y="180" text-anchor="end">P  = <tspan dx="-22" dy="4">r</tspan></text><text x="445" y="180" text-anchor="end">{{(data.Live.ReservedPower.value * 0.001)|numberFmt:'1.1-1'}}</text><text x="450" y="180">k{{data.Live.ReservedPower.unit}}</text>
         </g>
-        <text x="420" y="310" class="smaller" text-anchor="right">{{data.Live.LoadPercent.value|number:'1.1-1':language}} {{data.Live.LoadPercent.unit}}</text>
+        <text x="420" y="310" class="smaller" text-anchor="right">{{data.Live.LoadPercent.value|numberFmt:'1.1-1'}} {{data.Live.LoadPercent.unit}}</text>
         <use href="#flow" x="290" y="230" width="90" height="20" [ngClass]="{'animate': !!data.Live.LoadPower?.value, 'reverse': 0 > (data.Live.LoadPower?.value ?? 0)}" />
       </g>
 
       <g id="panels-block">
         <g>
-          <title>{{data.Live.PVETotalPercent.value|number:'1.1-1':language}} {{data.Live.PVETotalPercent.unit}}</title>
+          <title>{{data.Live.PVETotalPercent.value|numberFmt:'1.1-1'}} {{data.Live.PVETotalPercent.unit}}</title>
           <use href="#progress" class="progress-bg" x="190" y="0" width="100" height="100" />
           <use href="#progress" class="progress-panels" x="190" y="0" width="100" height="100" [ngStyle]="{'--percent': 100 < data.Live.PVETotalPercent.value ? 100 : data.Live.PVETotalPercent.value}" />
         </g>
         <use href="#panels" x="200" y="10" width="80" height="80" />
         <text x="240" y="55" filter="url(#bg-text)" dominant-baseline="middle" text-anchor="middle" font-weight="bold">{{data.Live.PVETotal.value}} {{data.Live.PVETotal.unit}}</text>
-        <text x="100" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="20" text-anchor="end">{{data.Live.PV1Voltage?.value|number:'1.1-1':language}}</text><text x="165" y="20">{{data.Live.PV1Voltage?.unit}}</text>
-        <text x="100" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="40" text-anchor="end">{{data.Live.PV1Current?.value|number:'1.1-1':language}}</text><text x="165" y="40">{{data.Live.PV1Current?.unit}}</text>
-        <text x="100" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="60" text-anchor="end">{{data.Live.PV1Power?.value|number:'1.1-1':language}}</text><text x="165" y="60">{{data.Live.PV1Power?.unit}}</text>
-        <text x="330" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="20" text-anchor="end">{{data.Live.PV2Voltage?.value|number:'1.1-1':language}}</text><text x="395" y="20">{{data.Live.PV2Voltage?.unit}}</text>
-        <text x="330" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="40" text-anchor="end">{{data.Live.PV2Current?.value|number:'1.1-1':language}}</text><text x="395" y="40">{{data.Live.PV2Current?.unit}}</text>
-        <text x="330" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="60" text-anchor="end">{{data.Live.PV2Power?.value|number:'1.1-1':language}}</text><text x="395" y="60">{{data.Live.PV2Power?.unit}}</text>
-        <text x="200" y="100" class="smaller" text-anchor="end">E = {{data.Live.PVETodayYield?.value|number:'1.1-1':language}} {{data.Live.PVETodayYield?.unit}}</text>
-        <text x="280" y="100" class="smaller" text-anchor="start">{{data.Live.PVETotalPercent.value|number:'1.1-1':language}} {{data.Live.PVETotalPercent.unit}}</text>
+        <text x="100" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="20" text-anchor="end">{{data.Live.PV1Voltage?.value|numberFmt:'1.1-1'}}</text><text x="165" y="20">{{data.Live.PV1Voltage?.unit}}</text>
+        <text x="100" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="40" text-anchor="end">{{data.Live.PV1Current?.value|numberFmt:'1.1-1'}}</text><text x="165" y="40">{{data.Live.PV1Current?.unit}}</text>
+        <text x="100" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">1</tspan></text><text x="160" y="60" text-anchor="end">{{data.Live.PV1Power?.value|numberFmt:'1.1-1'}}</text><text x="165" y="60">{{data.Live.PV1Power?.unit}}</text>
+        <text x="330" y="20" text-anchor="end">U  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="20" text-anchor="end">{{data.Live.PV2Voltage?.value|numberFmt:'1.1-1'}}</text><text x="395" y="20">{{data.Live.PV2Voltage?.unit}}</text>
+        <text x="330" y="40" text-anchor="end">I  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="40" text-anchor="end">{{data.Live.PV2Current?.value|numberFmt:'1.1-1'}}</text><text x="395" y="40">{{data.Live.PV2Current?.unit}}</text>
+        <text x="330" y="60" text-anchor="end">P  = <tspan dx="-21" dy="4">2</tspan></text><text x="390" y="60" text-anchor="end">{{data.Live.PV2Power?.value|numberFmt:'1.1-1'}}</text><text x="395" y="60">{{data.Live.PV2Power?.unit}}</text>
+        <text x="200" y="100" class="smaller" text-anchor="end">E = {{data.Live.PVETodayYield?.value|numberFmt:'1.1-1'}} {{data.Live.PVETodayYield?.unit}}</text>
+        <text x="280" y="100" class="smaller" text-anchor="start">{{data.Live.PVETotalPercent.value|numberFmt:'1.1-1'}} {{data.Live.PVETotalPercent.unit}}</text>
         <use href="#flow" x="195" y="135" width="90" height="20" transform="rotate(90 240 145)" [ngClass]="{'animate': 0 < data.Live.PVETotal.value}" />
       </g>
     </svg>
@@ -124,57 +124,57 @@
               <tr>
                 <th>L<sub>1</sub></th>
                 <td>
-                  {{data.Live.Grid1Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid1Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid1Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid1Current?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid1Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid1Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid1Power?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid1Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid1Power?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid1Frequency?.value|number:'1.2-2':language}}
+                  {{data.Live.Grid1Frequency?.value|numberFmt:'1.2-2'}}
                   {{data.Live.Grid1Frequency?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>L<sub>2</sub></th>
                 <td>
-                  {{data.Live.Grid2Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid2Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid2Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid2Current?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid2Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid2Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid2Power?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid2Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid2Power?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid2Frequency?.value|number:'1.2-2':language}}
+                  {{data.Live.Grid2Frequency?.value|numberFmt:'1.2-2'}}
                   {{data.Live.Grid2Frequency?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>L<sub>3</sub></th>
                 <td>
-                  {{data.Live.Grid3Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid3Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid3Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid3Current?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid3Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid3Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid3Power?.value|number:'1.1-1':language}}
+                  {{data.Live.Grid3Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.Grid3Power?.unit}}
                 </td>
                 <td>
-                  {{data.Live.Grid3Frequency?.value|number:'1.2-2':language}}
+                  {{data.Live.Grid3Frequency?.value|numberFmt:'1.2-2'}}
                   {{data.Live.Grid3Frequency?.unit}}
                 </td>
               </tr>
@@ -194,45 +194,45 @@
               <tr>
                 <th>L<sub>1</sub></th>
                 <td>
-                  {{data.Live.EPS1Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS1Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS1Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS1Current?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS1Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS1Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS1Power?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS1Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS1Power?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>L<sub>2</sub></th>
                 <td>
-                  {{data.Live.EPS2Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS2Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS2Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS2Current?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS2Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS2Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS2Power?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS2Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS2Power?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>L<sub>3</sub></th>
                 <td>
-                  {{data.Live.EPS3Voltage?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS3Voltage?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS3Voltage?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS3Current?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS3Current?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS3Current?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPS3Power?.value|number:'1.1-1':language}}
+                  {{data.Live.EPS3Power?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPS3Power?.unit}}
                 </td>
               </tr>
@@ -255,66 +255,66 @@
               <tr>
                 <th>{{'IndexTableYield'|translate}}</th>
                 <td>
-                  {{data.Live.YieldToday?.value|number:'1.2-2':language}}
+                  {{data.Live.YieldToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.YieldToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.YieldTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.YieldTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.YieldTotal?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>{{'IndexTableToGrid'|translate}}</th>
                 <td>
-                  {{data.Live.FeedInEnergyToday?.value|number:'1.2-2':language}}
+                  {{data.Live.FeedInEnergyToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.FeedInEnergyToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.FeedInEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.FeedInEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.FeedInEnergyTotal?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>{{'IndexTableFromGrid'|translate}}</th>
                 <td>
-                  {{data.Live.ConsumedEnergyToday?.value|number:'1.2-2':language}}
+                  {{data.Live.ConsumedEnergyToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.ConsumedEnergyToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.ConsumedEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.ConsumedEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.ConsumedEnergyTotal?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>EPS</th>
                 <td>
-                  {{data.Live.EPSEnergyToday?.value|number:'1.2-2':language}}
+                  {{data.Live.EPSEnergyToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.EPSEnergyToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.EPSEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.EPSEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.EPSEnergyTotal?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>{{'IndexTableCharging'|translate}}</th>
                 <td>
-                  {{data.Live.BatteryChargeEnergyToday?.value|number:'1.2-2':language}}
+                  {{data.Live.BatteryChargeEnergyToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.BatteryChargeEnergyToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.BatteryChargeEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.BatteryChargeEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.BatteryChargeEnergyTotal?.unit}}
                 </td>
               </tr>
               <tr>
                 <th>{{'IndexTableDischarging'|translate}}</th>
                 <td>
-                  {{data.Live.BatteryDischargeEnergyToday?.value|number:'1.2-2':language}}
+                  {{data.Live.BatteryDischargeEnergyToday?.value|numberFmt:'1.2-2'}}
                   {{data.Live.BatteryDischargeEnergyToday?.unit}}
                 </td>
                 <td>
-                  {{data.Live.BatteryDischargeEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.BatteryDischargeEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.BatteryDischargeEnergyTotal?.unit}}
                 </td>
               </tr>
@@ -325,7 +325,7 @@
                 <td>
                   <em>
                     @if (data.Live.YieldToday && data.Live.FeedInEnergyToday && data.Live.EPSEnergyToday) {
-                      {{(data.Live.YieldToday.value - data.Live.FeedInEnergyToday.value + data.Live.EPSEnergyToday.value)|number:'1.2-2':language}}
+                      {{(data.Live.YieldToday.value - data.Live.FeedInEnergyToday.value + data.Live.EPSEnergyToday.value)|numberFmt:'1.2-2'}}
                       {{data.Live.YieldToday.unit}}
                     }
                   </em>
@@ -333,7 +333,7 @@
                 <td>
                   <em>
                     @if (data.Live.YieldTotal && data.Live.FeedInEnergyTotal && data.Live.EPSEnergyTotal) {
-                      {{(data.Live.YieldTotal.value - data.Live.FeedInEnergyTotal.value + data.Live.EPSEnergyTotal.value)|number:'1.1-1':language}}
+                      {{(data.Live.YieldTotal.value - data.Live.FeedInEnergyTotal.value + data.Live.EPSEnergyTotal.value)|numberFmt:'1.1-1'}}
                       {{data.Live.YieldTotal.unit}}
                     }
                   </em>
@@ -346,7 +346,7 @@
                 <td>
                   <em>
                     @if (data.Live.YieldToday && data.Live.FeedInEnergyToday && data.Live.ConsumedEnergyToday && data.Live.EPSEnergyToday) {
-                      {{(data.Live.YieldToday.value - data.Live.FeedInEnergyToday.value + data.Live.ConsumedEnergyToday.value + data.Live.EPSEnergyToday.value)|number:'1.2-2':language}}
+                      {{(data.Live.YieldToday.value - data.Live.FeedInEnergyToday.value + data.Live.ConsumedEnergyToday.value + data.Live.EPSEnergyToday.value)|numberFmt:'1.2-2'}}
                       {{data.Live.YieldToday.unit}}
                     }
                   </em>
@@ -354,7 +354,7 @@
                 <td>
                   <em>
                     @if (data.Live.YieldTotal && data.Live.FeedInEnergyTotal && data.Live.ConsumedEnergyTotal && data.Live.EPSEnergyTotal) {
-                      {{(data.Live.YieldTotal.value - data.Live.FeedInEnergyTotal.value + data.Live.ConsumedEnergyTotal.value + data.Live.EPSEnergyTotal.value)|number:'1.1-1':language}}
+                      {{(data.Live.YieldTotal.value - data.Live.FeedInEnergyTotal.value + data.Live.ConsumedEnergyTotal.value + data.Live.EPSEnergyTotal.value)|numberFmt:'1.1-1'}}
                       {{data.Live.YieldTotal.unit}}
                     }
                   </em>
@@ -368,7 +368,7 @@
               <tr>
                 <th>{{'IndexTableYieldTotal'|translate}}</th>
                 <td>
-                  {{data.Live.PVEnergyTotal?.value|number:'1.1-1':language}}
+                  {{data.Live.PVEnergyTotal?.value|numberFmt:'1.1-1'}}
                   {{data.Live.PVEnergyTotal?.unit}}
                 </td>
               </tr>
@@ -379,7 +379,7 @@
               <tr>
                 <th>{{'SelfUseMinSoC'|translate}}</th>
                 <td>
-                  {{data.Live.SelfUseMinSoC?.value|number:'1.0':language}}
+                  {{data.Live.SelfUseMinSoC?.value|numberFmt:'1.0'}}
                   {{data.Live.SelfUseMinSoC?.unit}}
                 </td>
               </tr>
@@ -401,7 +401,7 @@
                 <th>{{'IndexTableExportControl'|translate}}</th>
                 <td>
                   @if (undefined !== (data.Live.ExportControl?.value ?? undefined)) {
-                    {{data.Live.ExportControl?.value|number:'1.0':language}}
+                    {{data.Live.ExportControl?.value|numberFmt:'1.0'}}
                     {{data.Live.ExportControl?.unit}}
                   }
                 </td>
@@ -414,7 +414,7 @@
                 <tr>
                   <th>{{'IndexTableBiasPower'|translate}}</th>
                   <td>
-                    {{data.Live.BiasPower?.value|number:'1.0':language}}
+                    {{data.Live.BiasPower?.value|numberFmt:'1.0'}}
                     {{data.Live.BiasPower?.unit}}
                   </td>
                 </tr>
@@ -435,7 +435,7 @@
            aria-hidden="true"
            class="link-like">◀</a>
       }
-      {{data.Prices.Date|dateTime:'D'}}
+      {{data.Prices.Date|dateFmt:'mediumDate'}}
       @if (data.IsSameDate && 13 <= data.Hour) {
         <a (click)="displayPrediction()"
            [attr.title]="'IndexMarketPricesPrediction'|translate"
@@ -460,7 +460,7 @@
               }}:</span>
             </th>
             @for (item of data.Prices.Data; track $index) {
-              <td [ngClass]="{'current-hour': item.Hour === data.Hour}">{{item.Price|number:'1.2-2':language}}</td>
+              <td [ngClass]="{'current-hour': item.Hour === data.Hour}">{{item.Price|numberFmt:'1.2-2'}}</td>
             }
           </tr>
           <tr>
@@ -477,8 +477,8 @@
               {{(1 === data.Prices.Multiplier ? 'IndexTableAverageInMWH' : 'IndexTableAverageInKWH')|translate}}:
             </th>
             <td colspan="4" [ngStyle]="{'--offset': avg.offsetWidth + 'px'}">
-              {{data.Prices.Average|number:'1.2-2':language}}
-              ({{'IndexTableThreshold'|translate}}: {{data.Prices.Threshold|number:'1.2-2':language}})
+              {{data.Prices.Average|numberFmt:'1.2-2'}}
+              ({{'IndexTableThreshold'|translate}}: {{data.Prices.Threshold|numberFmt:'1.2-2'}})
             </td>
           </tr>
         </table>

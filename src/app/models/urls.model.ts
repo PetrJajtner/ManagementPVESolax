@@ -18,11 +18,6 @@ export const JSON_CONFIG = 'assets/config.json';
  */
 export const JSON_DICTIONARY = 'assets/dictionary.json';
 
-/**
- * URL konfigurace lokalizaci
- */
-export const JSON_LOCALES_CONFIG = 'assets/locales.config.json';
-
 // --- Konfigurace API volani --------------------------------------------------
 
 /**
