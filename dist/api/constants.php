@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Soubor se tridou stridace
+ */
+const CLASS_INVERTER = __DIR__ . '/inverters/solax.php';
+
+/**
  * Pocet desetinnych mist
  */
 const DECIMAL_PLACES = 2;
@@ -31,6 +36,11 @@ const FILE_PRICES = __DIR__ . '/data/prices.json';
 const FILE_SETTINGS = __DIR__ . '/data/settings.json';
 
 /**
+ * Pocet ponechanych zazanmu vystupu
+ */
+const MIN_OUTPUT_LINES = 15;
+
+/**
  * Casove pasmo
  */
 const TIMEZONE = 'Europe/Prague';
@@ -44,3 +54,13 @@ date_default_timezone_set(TIMEZONE);
  * Nastavi limit zpracovani
  */
 set_time_limit(900); // 15 min.
+
+if (!function_exists('toJSON')) {
+
+  /**
+   * Zakoduje data do JSON a zformatuje vysledny retezec
+   */
+  function toJSON($data, $flags = JSON_PRETTY_PRINT) {
+    return str_replace('    ', '  ', json_encode($data, $flags)) . "\n";
+  }
+}

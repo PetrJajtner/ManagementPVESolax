@@ -142,9 +142,8 @@ class PricesParser {
    * Vypise data a ukonci beh
    */
   private function __output(array $data) {
-    $output = array();
+    $output = ['Date' => $this->__date];
     if (array_key_exists('data', $data) && $data['data']) {
-      $output['Date'] = $this->__date;
       $output['Average'] = $this->__priceAverage($data['data']);
       $output['Threshold'] = $this->__threshold;
       $output['Data'] = $data['data'];
@@ -153,9 +152,9 @@ class PricesParser {
       $output['Error'] = $data['error'];
     }
 
-    $json = str_replace('    ', '  ', json_encode($output, JSON_PRETTY_PRINT)) . "\n";
+    $json = toJSON($output);
     if ($this->__toFile) {
-      if (false !== file_put_contents(FILE_PRICES, $json, LOCK_EX)) {
+      if (false !== file_put_contents($this->__date === date('Y-m-d') ? FILE_PRICES : FILE_PREDICTION, $json, LOCK_EX)) {
         http_response_code(200);
       } else {
         http_response_code(500);

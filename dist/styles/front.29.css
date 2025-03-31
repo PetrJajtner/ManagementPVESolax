@@ -11,38 +11,54 @@ body {
   font-size: var(--font-size);
 }
 body, html {
-  height: 100%;
-}
-body.theme-dark button:not([data-type="submit"], [type="submit"], [disabled]) {
-  background-color: #8d8d8d;
-  border-color: #898989;
-}
-body.theme-dark button:not([data-type="submit"], [type="submit"], [disabled]):hover {
-  background-color: #7e7e7e;
-  border-color: #7b7b7b;
+  min-height: 100%;
 }
 button {
+  background-color: var(--ui-bg-color-basic);
+  border: 0.0625rem outset var(--ui-bg-color-basic);
   border-radius: 0.25rem;
-  border-width: 0.0625rem;
+  color: var(--ui-text-color-basic);
   padding: 0.25rem 0.5rem;
+  transition: background-color 0.2s, border-color 0.2s;
 }
-button[data-type="submit"]:not([disabled]),
-button[type="submit"]:not([disabled]) {
-  appearance: button;
-  background-color: #0060df;
-  border-color: #2080df;
-  border-style: outset;
-  color: #fff;
+button:not(:disabled):hover {
+  background-color: var(--ui-bg-color-hover);
+  border-color: var(--ui-bg-color-hover);
 }
-button[data-type="submit"]:not([disabled]):hover,
-button[type="submit"]:not([disabled]):hover {
-  background-color: #0050b9;
-  border-color: #0060df;
+button:not(:disabled):active {
+  background-color: var(--ui-bg-color-active);
+  border: 0.0625rem inset var(--ui-bg-color-active);
 }
-button[disabled] {
-  background-color: #efefef4d;
-  border-color: #7676764d;
-  color: #1010104d;
+button:disabled {
+  background-color: var(--ui-bg-color-disabled);
+  border-color: var(--ui-bg-color-disabled);
+  color: var(--ui-text-color-disabled);
+  cursor: not-allowed;
+}
+button:not(:disabled).danger {
+  background-color: var(--ui-bg-danger-basic);
+  border-color: var(--ui-bg-danger-basic);
+  color: var(--ui-text-color-basic);
+}
+button:not(:disabled).danger:hover {
+  background-color: var(--ui-bg-danger-hover);
+  border-color: var(--ui-bg-danger-hover);
+}
+button:not(:disabled).danger:active {
+  background-color: var(--ui-bg-danger-active);
+  border-color: var(--ui-bg-danger-active);
+}
+button:not(:disabled).secondary {
+  background-color: var(--ui-bg-secondary-basic);
+  border-color: var(--ui-bg-secondary-basic);
+}
+button:not(:disabled).secondary:hover {
+  background-color: var(--ui-bg-secondary-hover);
+  border-color: var(--ui-bg-secondary-hover);
+}
+button:not(:disabled).secondary:active {
+  background-color: var(--ui-bg-secondary-active);
+  border-color: var(--ui-bg-secondary-active);
 }
 circle {
   transition: stroke-dashoffset 1s ease;
@@ -56,6 +72,11 @@ fieldset {
 details {
   margin-top: 1em;
   padding: 0.35em 0.75em 0.625em;
+}
+h1[aria-hidden="true"],
+span[aria-hidden="true"] {
+  cursor: pointer;
+  user-select: none;
 }
 h1, h2 {
   margin: 0.67em 0 0;
@@ -72,10 +93,72 @@ hr {
   border-top: 0.0625rem solid var(--color-frame, #ccc);
   margin: 1rem 0;
 }
+input[type="checkbox"] {
+  align-items: center;
+  appearance: none;
+  background-color: var(--ui-bg-color-unchecked);
+  border-radius: 0.25rem;
+  border: 0.0625rem solid var(--color-border);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1rem;
+  justify-content: center;
+  line-height: 1rem;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+  vertical-align: top;
+  width: 1rem;
+}
+input[type="checkbox"]::before {
+  color: var(--ui-text-color-basic);
+  font-family: checkbox;
+  font-size: 0.75rem;
+  font-weight: bold;
+  position: absolute;
+}
+input[type="checkbox"]:not(:disabled):hover {
+  border-color: var(--ui-bg-color-hover);
+}
+input[type="checkbox"]:not(:disabled):active {
+  border-color: var(--ui-bg-color-active);
+}
+input[type="checkbox"]:checked {
+  background-color: var(--ui-bg-color-basic);
+  border-color: var(--ui-bg-color-basic);
+}
+input[type="checkbox"]:checked::before {
+  content: '✔';
+}
+input[type="checkbox"]:not(:disabled):checked:hover {
+  background-color: var(--ui-bg-color-hover);
+}
+input[type="checkbox"]:not(:disabled):checked:active {
+  background-color: var(--ui-bg-color-active);
+}
+input[type="checkbox"]:indeterminate {
+  background-color: var(--ui-bg-color-basic);
+}
+input[type="checkbox"]:indeterminate::before {
+  content: '–';
+}
+input[type="checkbox"]:disabled {
+  background-color: var(--ui-bg-color-disabled);
+  border-color: var(--ui-bg-color-disabled);
+  cursor: not-allowed;
+}
+input[type="checkbox"]:disabled:checked {
+  background-color: var(--ui-bg-color-disabled);
+}
+input[type="checkbox"]:disabled:checked::before,
+input[type="checkbox"]:disabled:indeterminate::before {
+  color: var(--ui-text-color-disabled);
+}
+input[type="date"],
 input[type="number"],
 input[type="text"] {
   appearance: textfield;
 }
+input[type="date"],
 input[type="number"],
 input[type="text"],
 select {
@@ -112,7 +195,7 @@ p:not(:last-child) {
 }
 p > label:first-child,
 p > span:first-child > label {
-  width: 14rem;
+  width: 15rem;
 }
 p > label:not(:first-child),
 p > span:not(:first-child) > label {
@@ -121,11 +204,17 @@ p > span:not(:first-child) > label {
 main {
   margin: 0.5rem;
 }
+select#VerboseLevel {
+  width: max-content;
+}
 summary {
   background-color: var(--color-background, #fff);
   margin: -0.875rem 0 0.5rem;
   white-space: nowrap;
   width: min-content;
+}
+svg:hover .message-number {
+  fill: #808080ff;
 }
 table {
   background-color: var(--color-table-cell-odd, #e4e4e4);
@@ -195,10 +284,11 @@ use[href="#flow"].animate.reverse {
 }
 .flow-dot {
   animation: var(--animation, none) 1.5s linear infinite;
-  fill: var(--color-active, #f7b61e);
+  fill: var(--color-active, #fc0);
   opacity: 0;
 }
-.help fieldset p strong {
+.help fieldset p strong,
+.index-info-message strong {
   display: inline-block;
   width: 10rem;
 }
@@ -236,7 +326,7 @@ use[href="#flow"].animate.reverse {
   background-color: var(--color-active-even, #f7b61e54);
 }
 .index-market-prices th.current-hour {
-  color: var(--color-active, #f7b61e);
+  color: var(--color-active, #fc0);
 }
 .index-measurements {
   display: flex;
@@ -269,6 +359,11 @@ use[href="#flow"].animate.reverse {
   display: inline-block;
   font-size: 0;
 }
+.message-number {
+  fill: #80808000;
+  font-size: 0.75rem;
+  transition: fill 0.5s;
+}
 .menu-list {
   display: flex;
   list-style: none;
@@ -286,6 +381,13 @@ use[href="#flow"].animate.reverse {
 }
 .menu-list__item-link--active {
   color: var(--color-active, #fc0);
+}
+.plain-text {
+  font-family: monospace;
+  font-size: 0.875rem;
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre-line;
 }
 .progress-bg {
   stroke: var(--color-progress, #ddd);
@@ -307,6 +409,10 @@ use[href="#flow"].animate.reverse {
   fill: #808080;
   font-size: 0.875rem;
 }
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
 .wait {
   cursor: wait;
   overflow: hidden;
@@ -316,13 +422,10 @@ use[href="#flow"].animate.reverse {
   bottom: 0;
   content: '';
   cursor: wait;
-  display: flex;
-  flex: 1 1 auto;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
-  width: 100%;
   z-index: 10000;
 }
 
@@ -370,14 +473,14 @@ use[href="#flow"].animate.reverse {
 
   form p > label:first-child,
   form p > span:first-child > label {
-    width: 12.5rem;
+    width: 13rem;
   }
   form p > span:nth-child(2) {
-    display: block;
+    display: inline-block;
   }
   form p > span:nth-child(2) > label {
     padding-left: 1rem;
-    width: 12.5rem;
+    width: 13rem;
   }
   h1, h2 {
     margin: 0.5em 0 0.25em;
@@ -391,10 +494,14 @@ use[href="#flow"].animate.reverse {
   }
   input[type="text"],
   select {
-    width: 9rem;
+    width: 8.5rem;
   }
   input[type="number"] {
     width: 5rem;
+  }
+  p > label:first-child,
+  p > span:first-child > label {
+    width: 13rem;
   }
   svg {
     display: block;
@@ -525,6 +632,12 @@ use[href="#flow"].animate.reverse {
     justify-content: space-between;
     position: sticky;
     top: 0;
+  }
+  label[title] {
+    cursor: help;
+    text-decoration-color: var(--color-active, #fc0);
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
   }
   main {
     margin: 0.5rem auto;

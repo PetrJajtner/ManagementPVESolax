@@ -4,12 +4,12 @@ import {
 } from '@angular/forms';
 import {
   KEY_BIAS_MODE, KEY_BIAS_POWER, KEY_EXPORT_CONTROL, KEY_MANUAL_MODE_CHARGING,
-  KEY_SELF_USE_MIN_SOC, KEY_WORKING_MODE, LiveData, MANUAL_MODES, RegistryData,
+  KEY_SELF_USE_MIN_SOC, KEY_WORKING_MODE, MANUAL_MODES, RegistryData,
   WORKING_MODES
 } from '@app/models/pve.model';
 import {
-  DistributionType, ExportType, RegistryType, SettingsType, SmartChargeType,
-  SmartExportType, SupplyPointType, SystemType
+  ExportType, RegistryType, SettingsType, SmartChargeType, SmartExportType,
+  SupplyPointType, SystemType
 } from '@app/models/settings.model';
 import { API, API_CONNECTION, API_REGISTRY, API_SETTINGS } from '@app/models/urls.model';
 import { isBoolean, isNumeric, isString, logException } from '@app/models/utils.model';
@@ -21,15 +21,13 @@ import { WaitService } from '@app/services/wait.service';
  * Vychozi prednastavena data nastaveni
  */
 export const DEFAULT_SETTINGS: SettingsType = {
-  Distribution: {
-    ConsumptionMultiplier: 2,
-    FixPrice:              200
-  },
   DongleID: 'S_________',
   Export:   {
-    OffValue: 0,
-    OnValue:  10000,
-    Status:   false
+    OffValue:          0,
+    OnValue:           10000,
+    Status:            false,
+    UseManual:         false,
+    UseNegativePrices: true
   },
   Location:     'http://192.168.0.2',
   SmartCharge: {
@@ -51,8 +49,7 @@ export const DEFAULT_SETTINGS: SettingsType = {
     MonthEnd:            10,
     MonthStart:          3,
     PriceMultiplier:     1.25,
-    Status:              false,
-    UseNegativePrices:   false
+    Status:              false
   },
   SupplyPoint: {
     CircuitBreakerValue: 25,
@@ -60,11 +57,12 @@ export const DEFAULT_SETTINGS: SettingsType = {
     PhasesCount:         3
   },
   System: {
+    Date: '2000-01-01',
     Name: 'Instalace',
     Size: 10000
   },
-  Tax:       1.21,
-  Threshold: 1200
+  Threshold:    1200,
+  VerboseLevel: 1
 } as const;
 
 /**
@@ -224,20 +222,14 @@ const OPTS_UINT: FieldOptions = {
 };
 
 /**
- * Formularova cast pro distribuci
- */
-type DistributionForm = {
-  ConsumptionMultiplier: FormControl<number>;
-  FixPrice:              FormControl<number>;
-};
-
-/**
  * Formularova cast pro nastaveni exportu
  */
 type ExportForm = {
-  OffValue: FormControl<number>;
-  OnValue:  FormControl<number>;
-  Status:   FormControl<boolean>;
+  OffValue:          FormControl<number>;
+  OnValue:           FormControl<number>;
+  Status:            FormControl<boolean>;
+  UseManual:         FormControl<boolean>;
+  UseNegativePrices: FormControl<boolean>;
 };
 
 /**
@@ -263,7 +255,6 @@ export type RegistryForm = {
  * Typ pro formular nastaveni rizeni FVE
  */
 export type SettingsForm = {
-  Distribution: FormGroup<DistributionForm>;
   DongleID:     FormControl<string>;
   Export:       FormGroup<ExportForm>;
   Location:     FormControl<string>;
@@ -271,8 +262,8 @@ export type SettingsForm = {
   SmartExport:  FormGroup<SmartExportForm>;
   SupplyPoint:  FormGroup<SupplyPointForm>;
   System:       FormGroup<SystemForm>;
-  Tax:          FormControl<number>;
   Threshold:    FormControl<number>;
+  VerboseLevel: FormControl<number>;
 };
 
 /**
@@ -302,7 +293,6 @@ type SmartExportForm = {
   MonthStart:          FormControl<number>;
   PriceMultiplier:     FormControl<number>;
   Status:              FormControl<boolean>;
-  UseNegativePrices:   FormControl<boolean>;
 };
 
 /**
@@ -318,6 +308,7 @@ type SupplyPointForm = {
  * Formularova cast pro informace o systemu
  */
 type SystemForm = {
+  Date: FormControl<string>;
   Name: FormControl<string>;
   Size: FormControl<number>;
 };
@@ -364,7 +355,7 @@ export class SettingsService {
         try {
           const
             response = await fetch(API.BuildUrl(endPoint)),
-            registry = await response.json() as RegistryData,
+            registry = response.ok ? await response.json() as RegistryData : {},
             data = this.__fixRegistry(registry)
           ;
           this.__registrySg.set(data);
@@ -402,7 +393,7 @@ export class SettingsService {
         try {
           const
             response = await fetch(API.BuildUrl(endPoint)),
-            settings = await response.json() as Partial<SettingsType>,
+            settings = response.ok ? await response.json() as Partial<SettingsType> : {},
             data = this.__fixSettings(settings);
           ;
           this.__settingsSg.set(data);
@@ -418,15 +409,13 @@ export class SettingsService {
    * Formular nastaveni rizeni FVE
    */
   private __settingsForm: FormGroup<SettingsForm> = this.__formBuilder.group<SettingsForm>({
-    Distribution: this.__formBuilder.group<DistributionForm>({
-      ConsumptionMultiplier: this.__formBuilder.control<number>(DEFAULT_SETTINGS.Distribution.ConsumptionMultiplier, OPTS_MULTIPLIER),
-      FixPrice:              this.__formBuilder.control<number>(DEFAULT_SETTINGS.Distribution.FixPrice, OPTS_PRICE)
-    }),
     DongleID: this.__formBuilder.control<string>(DEFAULT_SETTINGS.DongleID, OPTS_DONGLE),
     Export:   this.__formBuilder.group<ExportForm>({
-      OffValue: this.__formBuilder.control<number>(DEFAULT_SETTINGS.Export.OffValue, OPTS_UINT),
-      OnValue:  this.__formBuilder.control<number>(DEFAULT_SETTINGS.Export.OnValue, OPTS_UINT),
-      Status:   this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.Export.Status, {nonNullable: true})
+      OffValue:          this.__formBuilder.control<number>(DEFAULT_SETTINGS.Export.OffValue, OPTS_UINT),
+      OnValue:           this.__formBuilder.control<number>(DEFAULT_SETTINGS.Export.OnValue, OPTS_UINT),
+      Status:            this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.Export.Status, {nonNullable: true}),
+      UseManual:         this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.Export.UseManual, {nonNullable: true}),
+      UseNegativePrices: this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.Export.UseNegativePrices, {nonNullable: true})
     }),
     Location:    this.__formBuilder.control<string>(DEFAULT_SETTINGS.Location, OPTS_IP),
     SmartCharge: this.__formBuilder.group<SmartChargeForm>({
@@ -448,8 +437,7 @@ export class SettingsService {
       MonthEnd:            this.__formBuilder.control<number>(DEFAULT_SETTINGS.SmartExport.MonthEnd, OPTS_MONTH),
       MonthStart:          this.__formBuilder.control<number>(DEFAULT_SETTINGS.SmartExport.MonthStart, OPTS_MONTH),
       PriceMultiplier:     this.__formBuilder.control<number>(DEFAULT_SETTINGS.SmartExport.PriceMultiplier, OPTS_MULTIPLIER),
-      Status:              this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.SmartExport.Status, {nonNullable: true}),
-      UseNegativePrices:   this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.SmartExport.UseNegativePrices, {nonNullable: true})
+      Status:              this.__formBuilder.control<boolean>(DEFAULT_SETTINGS.SmartExport.Status, {nonNullable: true})
     }),
     SupplyPoint: this.__formBuilder.group<SupplyPointForm>({
       CircuitBreakerValue: this.__formBuilder.control<number>(DEFAULT_SETTINGS.SupplyPoint.CircuitBreakerValue, OPTS_UINT),
@@ -457,11 +445,12 @@ export class SettingsService {
       PhasesCount:         this.__formBuilder.control<number>(DEFAULT_SETTINGS.SupplyPoint.PhasesCount, OPTS_SINGLE)
     }),
     System: this.__formBuilder.group<SystemForm>({
+      Date: this.__formBuilder.control<string>(DEFAULT_SETTINGS.System.Date, {nonNullable: true, validators: Validators.required}),
       Name: this.__formBuilder.control<string>(DEFAULT_SETTINGS.System.Name, {nonNullable: true, validators: Validators.required}),
       Size: this.__formBuilder.control<number>(DEFAULT_SETTINGS.System.Size, OPTS_UINT)
     }),
-    Tax:       this.__formBuilder.control<number>(DEFAULT_SETTINGS.Tax, OPTS_MULTIPLIER),
-    Threshold: this.__formBuilder.control<number>(DEFAULT_SETTINGS.Threshold, OPTS_UINT)
+    Threshold:    this.__formBuilder.control<number>(DEFAULT_SETTINGS.Threshold, OPTS_PRICE),
+    VerboseLevel: this.__formBuilder.control<number>(DEFAULT_SETTINGS.VerboseLevel, OPTS_SINGLE)
   });
 
   /**
@@ -571,6 +560,7 @@ export class SettingsService {
           isString(values.SmartCharge?.PricesCount) && (values.SmartCharge.PricesCount = +values.SmartCharge.PricesCount);
           isString(values.SmartExport?.MonthEnd) && (values.SmartExport.MonthEnd = +values.SmartExport.MonthEnd);
           isString(values.SmartExport?.MonthStart) && (values.SmartExport.MonthStart = +values.SmartExport.MonthStart);
+          isString(values.VerboseLevel) && (values.VerboseLevel = +values.VerboseLevel);
           return values;
         },
         data = fixValues(values),
@@ -598,13 +588,6 @@ export class SettingsService {
     } finally {
       this.__waitSrv.wait = false;
     }
-  }
-
-  /**
-   * Nastavi data registru z externiho zdroje (typicky live-data)
-   */
-  public setRegistry(data: LiveData): void {
-    void Promise.resolve().then(() => this.__registrySg.set(this.__fixRegistry(data)));
   }
 
   /**
@@ -655,7 +638,6 @@ export class SettingsService {
   private __fixSettings(data: Partial<SettingsType>): SettingsType {
     const result = {
       ...DEFAULT_SETTINGS,
-      Distribution: {...DEFAULT_SETTINGS.Distribution} as Partial<DistributionType>,
       Export:       {...DEFAULT_SETTINGS.Export} as Partial<ExportType>,
       SmartCharge:  {...DEFAULT_SETTINGS.SmartCharge} as Partial<SmartChargeType>,
       SmartExport:  {...DEFAULT_SETTINGS.SmartExport} as Partial<SmartExportType>,
@@ -663,14 +645,13 @@ export class SettingsService {
       System:       {...DEFAULT_SETTINGS.System} as Partial<SystemType>
     } as SettingsType;
 
-    isNumeric(data.Distribution?.ConsumptionMultiplier) && (result.Distribution.ConsumptionMultiplier = +data.Distribution.ConsumptionMultiplier);
-    isNumeric(data.Distribution?.FixPrice) && (result.Distribution.FixPrice = +data.Distribution.FixPrice);
-
     isString(data.DongleID) && (result.DongleID = `${data.DongleID}`.trim());
 
     isNumeric(data.Export?.OffValue) && (result.Export.OffValue = +data.Export.OffValue);
     isNumeric(data.Export?.OnValue) && (result.Export.OnValue = +data.Export.OnValue);
     isBoolean(data.Export?.Status) && (result.Export.Status = !!data.Export.Status);
+    isBoolean(data.Export?.UseManual) && (result.Export.UseManual = !!data.Export.UseManual);
+    isBoolean(data.Export?.UseNegativePrices) && (result.Export.UseNegativePrices = !!data.Export.UseNegativePrices);
 
     isString(data.Location) && (result.Location = `${data.Location}`.trim());
 
@@ -692,17 +673,17 @@ export class SettingsService {
     isNumeric(data.SmartExport?.MonthStart) && (result.SmartExport.MonthStart = +data.SmartExport.MonthStart);
     isNumeric(data.SmartExport?.PriceMultiplier) && (result.SmartExport.PriceMultiplier = +data.SmartExport.PriceMultiplier);
     isBoolean(data.SmartExport?.Status) && (result.SmartExport.Status = !!data.SmartExport.Status);
-    isBoolean(data.SmartExport?.UseNegativePrices) && (result.SmartExport.UseNegativePrices = !!data.SmartExport.UseNegativePrices);
 
     isNumeric(data.SupplyPoint?.CircuitBreakerValue) && (result.SupplyPoint.CircuitBreakerValue = +data.SupplyPoint.CircuitBreakerValue);
     isNumeric(data.SupplyPoint?.NormalizedVoltage) && (result.SupplyPoint.NormalizedVoltage = +data.SupplyPoint.NormalizedVoltage);
     isNumeric(data.SupplyPoint?.PhasesCount) && (result.SupplyPoint.PhasesCount = +data.SupplyPoint.PhasesCount);
 
+    isString(data.System?.Date) && (result.System.Date = `${data.System.Date}`.trim());
     isString(data.System?.Name) && (result.System.Name = `${data.System.Name}`.trim());
     isNumeric(data.System?.Size) && (result.System.Size = +data.System.Size);
 
-    isNumeric(data.Tax) && (result.Tax = +data.Tax);
     isNumeric(data.Threshold) && (result.Threshold = +data.Threshold);
+    isNumeric(data.VerboseLevel) && (result.VerboseLevel = +data.VerboseLevel);
 
     return result;
   }

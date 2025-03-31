@@ -19,20 +19,14 @@ export const ERROR_MAP: Readonly<Record<string, string | string[]>> = Object.fre
 });
 
 /**
- * Typ pro distribucni poplatek
+ * Urovne „ukecanosti“ spoustece
  */
-export type DistributionType = {
-
-  /**
-   * Sazba za kWh bez DPH v Kc
-   */
-  ConsumptionMultiplier: number;
-
-  /**
-   * Staly mesicni plat
-   */
-  FixPrice: number;
-};
+export const VERBOSE_LEVELS: readonly string[] = Object.freeze([
+  /* 0 => */ 'SettingsVerboseLevelNone',
+  /* 1 => */ 'SettingsVerboseLevelChange',
+  /* 2 => */ 'SettingsVerboseLevelMessage',
+  /* 3 => */ 'SettingsVerboseLevelAll'
+]);
 
 /**
  * Typ pro rizeni exportu
@@ -53,6 +47,16 @@ export type ExportType = {
    * Priznak rizeni pomoci EC
    */
   Status: boolean;
+
+  /**
+   * Priznak pouziti manualniho rezimu pro vyuziti zapornych cen
+   */
+  UseManual: boolean;
+
+  /**
+   * Priznak vyuziti zapornych cen
+   */
+  UseNegativePrices: boolean;
 };
 
 /**
@@ -151,11 +155,6 @@ export type SmartExportType = {
    * Priznak rizeni pomoci SmE
    */
   Status: boolean;
-
-  /**
-   * Priznak vyuziti zapornych cen
-   */
-  UseNegativePrices: boolean;
 };
 
 /**
@@ -200,11 +199,6 @@ export type RegistryType = {
 export type SettingsType = {
 
   /**
-   * Distribucni poplatek
-   */
-  Distribution: DistributionType;
-
-  /**
    * Nazev WIFI zarizeni
    */
   DongleID: string;
@@ -240,14 +234,14 @@ export type SettingsType = {
   System: SystemType;
 
   /**
-   * Dan (jako nasobek, napr. 1.21)
-   */
-  Tax: number;
-
-  /**
    * Cenovy prah
    */
   Threshold: number;
+
+  /**
+   * Uroven „ukecanosti“ spoustece
+   */
+  VerboseLevel: number;
 };
 
 /**
@@ -275,6 +269,11 @@ export type SupplyPointType = {
  * Typ pro informace o systemu
  */
 export type SystemType = {
+
+  /**
+   * Datum spusteni FVE systemu ve formatu RRRR-MM-DD
+   */
+  Date: string;
 
   /**
    * Nazev instalace

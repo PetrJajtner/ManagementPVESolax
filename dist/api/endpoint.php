@@ -5,43 +5,51 @@ require_once __DIR__ . '/constants.php';
 $action = $_REQUEST['action'];
 $method = $_SERVER['REQUEST_METHOD'];
 
+if ('charge' === $action && 'GET' === $method) {
+  header('Content-type: application/json; charset="UTF-8"');
+  readfile(FILE_CHARGE);
+  exit;
+}
+
 if ('connection' === $action && 'POST' === $method) {
-  require_once __DIR__ . '/inverters/solax.php';
+  require_once CLASS_INVERTER;
 
   $config = json_decode(file_get_contents('php://input'), true);
   $solax = new SolaX($config);
   $data = $solax->readVersion();
 
   header('Content-type: application/json; charset="UTF-8"');
-  echo json_encode((object) ['Success' => 0 < count($data)], JSON_PRETTY_PRINT) . "\n";
+  echo toJSON(['Success' => 0 < count($data)]);
 
   exit;
 }
 
 if ('live-data' === $action) {
-  require_once __DIR__ . '/inverters/solax.php';
+  require_once CLASS_INVERTER;
 
   $settings = json_decode(file_get_contents(FILE_SETTINGS), true);
   $solax = new SolaX($settings);
 
+  ini_set('output_buffering', 'off');
   ob_implicit_flush(true);
+  ignore_user_abort(true);
 
   header('Content-Type: text/event-stream');
   header('Cache-Control: no-cache');
   header('Connection: keep-alive');
   header('Access-Control-Allow-Origin: *');
 
-  $id = 0;
-  $control = $solax->readSetData(null, null);
+  $id = -1;
+  $control = [];
   while (!connection_aborted()) {
-    if (++$id === 25) { // cca. 5 min. -> nove spojeni
+    if (0 === (++$id % 10)) { // cca. 1,5 min. -> nove nacteni
       $control = $solax->readSetData(null, null);
-      $id = 0;
     }
 
     $data = array_merge($solax->readRealData(null, null), $control, ['Date' => date('c')]);
     $msg = json_encode($data);
 
+    echo "id: {$id}\n";
     echo "event: data\n";
     echo "data: {$msg}\n\n";
 
@@ -53,10 +61,31 @@ if ('live-data' === $action) {
   exit;
 }
 
+if ('output' === $action) {
+  if ('DELETE' === $method) {
+    if (false === file_put_contents(FILE_OUTPUT, '')) {
+      header('HTTP/1.1 500 Internal Server Error');
+    }
+    exit;
+  }
+  if ('PATCH' === $method) { /* promaze obsah vystupu a pouzije metodu GET */
+    $lines = array_slice(file(FILE_OUTPUT, FILE_IGNORE_NEW_LINES), -MIN_OUTPUT_LINES);
+    if (false === file_put_contents(FILE_OUTPUT, implode(PHP_EOL, $lines).PHP_EOL)) {
+      header('HTTP/1.1 500 Internal Server Error');
+      exit;
+    }
+    $method = 'GET';
+  }
+  if ('GET' === $method) {
+    header('Content-type: text/plain; charset="UTF-8"');
+    readfile(FILE_OUTPUT);
+    exit;
+  }
+}
+
 if ('prediction' === $action && 'GET' === $method) {
-  $_REQUEST['json'] = true;
-  $_REQUEST['1'] = true;
-  require_once __DIR__.'/parser.php';
+  header('Content-type: application/json; charset="UTF-8"');
+  readfile(FILE_PREDICTION);
   exit;
 }
 
@@ -67,15 +96,14 @@ if ('prices' === $action && 'GET' === $method) {
 }
 
 if ('registry' === $action) {
-  require_once __DIR__ . '/inverters/solax.php';
+  require_once CLASS_INVERTER;
 
   $settings = json_decode(file_get_contents(FILE_SETTINGS), true);
   $solax = new SolaX($settings);
 
   if ('GET' === $method) {
     header('Content-type: application/json; charset="UTF-8"');
-    $data = $solax->readSetData(null, null);
-    echo json_encode($data);
+    echo toJSON($solax->readSetData(null, null));
     exit;
   }
 
@@ -107,7 +135,7 @@ if ('registry' === $action) {
     }
 
     header('Content-type: application/json; charset="UTF-8"');
-    echo json_encode((object) ['Success' => $result], JSON_PRETTY_PRINT) . "\n";
+    echo toJSON(['Success' => $result]);
 
     exit;
   }
@@ -123,11 +151,11 @@ if ('settings' === $action) {
   if ('POST' === $method) {
     $original = json_decode(file_get_contents(FILE_SETTINGS), true);
     $data = json_decode(file_get_contents('php://input'), true);
-    $json = str_replace('    ', '  ', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . "\n";
+    $json = toJSON($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     $result = false !== file_put_contents(FILE_SETTINGS, $json, LOCK_EX);
 
     header('Content-type: application/json; charset="UTF-8"');
-    echo json_encode((object) ['Success' => $result], JSON_PRETTY_PRINT) . "\n";
+    echo toJSON(['Success' => $result]);
 
     if ($data['Threshold'] !== $original['Threshold']) {
       require_once __DIR__.'/parser.php';
@@ -138,14 +166,14 @@ if ('settings' === $action) {
 }
 
 if ('versions' === $action && 'GET' === $method) {
-  require_once __DIR__ . '/inverters/solax.php';
+  require_once CLASS_INVERTER;
 
   $settings = json_decode(file_get_contents(FILE_SETTINGS), true);
   $solax = new SolaX($settings);
 
   header('Content-type: application/json; charset="UTF-8"');
   $data = $solax->readVersion();
-  echo str_replace('    ', '  ', json_encode($data, JSON_PRETTY_PRINT)) . "\n";
+  echo toJSON($data);
   exit;
 }
 

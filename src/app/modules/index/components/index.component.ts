@@ -33,11 +33,14 @@ type ComponentData = {
  */
 type ExtendedLiveData = LiveData & {
   LoadPercent:     Measurement;
+  PVESystemDate:   string;
   PVESystemName:   string;
   PVESystemSize:   number;
   PVETotal:        Measurement;
   PVETotalPercent: Measurement;
   ReservedPower:   Measurement;
+  RunningDays:     number;
+  RunningYears:    number;
 };
 
 /**
@@ -80,7 +83,7 @@ export class IndexComponent {
   /**
    * Signal zivych dat
    */
-  private __liveDataSg: Signal<LiveData> = this.__liveDataSrv.liveDataSg(this.__destroyRef);
+  private __liveDataSg: Signal<LiveData> = this.__liveDataSrv.liveDataSg(/* this.__destroyRef */);
 
   /**
    * Aktualni hodina
@@ -95,7 +98,7 @@ export class IndexComponent {
       {SupplyPoint, System} = this.__settingsSrv.settingsSg() ?? {SupplyPoint: DEFAULT_SETTINGS.SupplyPoint, System: DEFAULT_SETTINGS.System},
       ReservedPower = {value: SupplyPoint.CircuitBreakerValue * SupplyPoint.NormalizedVoltage * SupplyPoint.PhasesCount, unit: 'W'}
     ;
-    return {PVESystemName: System.Name, PVESystemSize: System.Size, ReservedPower};
+    return {PVESystemDate: System.Date, PVESystemName: System.Name, PVESystemSize: System.Size, ReservedPower};
   });
 
   /**
@@ -107,7 +110,9 @@ export class IndexComponent {
       PVETotalPercent: {value: 0, unit: '%'} as Measurement,
       LoadPercent:     {value: 0, unit: '%'} as Measurement,
       ...this.__settingsDataSg(),
-      ...this.__liveDataSg()
+      ...this.__liveDataSg(),
+      RunningDays:     0,
+      RunningYears:    0
     } as ExtendedLiveData;
 
     if (result.PV1Power && result.PV2Power) {
@@ -122,6 +127,11 @@ export class IndexComponent {
       if (0 > result.LoadPercent.value) {
         result.LoadPercent.value = 0;
       }
+    }
+    if (null !== result.PVESystemDate.match(/\d{4}-\d{2}-\d{2}/)) {
+      const difference = Date.now() - (new Date(result.PVESystemDate as string)).valueOf();
+      result.RunningDays = difference / 86400000;
+      result.RunningYears = result.RunningDays / 365.25;
     }
 
     return result;
@@ -199,6 +209,13 @@ export class IndexComponent {
   }
 
   /**
+   * Obnovi ziva data
+   */
+  public refresh(): void {
+    this.__liveDataSrv.refresh();
+  }
+
+  /**
    * Prepne zobrazeni cen
    */
   public switchPrice(): void {
@@ -212,13 +229,10 @@ export class IndexComponent {
   private __scrollToCurrentHour(): void {
     setTimeout(() => {
       const
-        wrapper = document.querySelector('.index-market-prices') as HTMLElement,
-        element = document.querySelector('.current-hour') as HTMLElement
+        wrapper = document.querySelector<HTMLElement>('.index-market-prices'),
+        element = document.querySelector<HTMLElement>('.current-hour')
       ;
-      if (!wrapper || !element) {
-        return;
-      }
-      wrapper.scrollTo({left: element.offsetLeft - 3 * element.offsetWidth, behavior: 'smooth'});
+      wrapper && element && wrapper.scrollTo({behavior: 'smooth', left: element.offsetLeft - 3 * element.offsetWidth});
     }, 250);
   }
 

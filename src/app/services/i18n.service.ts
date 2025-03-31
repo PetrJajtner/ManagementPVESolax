@@ -65,7 +65,7 @@ export class I18nService {
       try {
         const
           response = await fetch(JSON_DICTIONARY),
-          dictionary = await response.json() as Dictionary
+          dictionary = response.ok ? await response.json() as Dictionary : {}
         ;
 
         this.__setLanguage(this.__storageSrv.getValue<string>(COMMON_I18N_SRV_LANGUAGE, this.__configSrv.defaultLanguage) as string);

@@ -12,6 +12,21 @@
 
   --font-family: 'Open Sans', Arial, Helvetica, sans-serif;
   --font-size: 16px;
+
+  --ui-bg-color-active: #ad7b00;
+  --ui-bg-color-basic: var(--color-active);
+  --ui-bg-color-hover: #d29900;
+  --ui-bg-color-unchecked: transparent;
+
+  --ui-bg-danger-active: #9e2121;
+  --ui-bg-danger-basic: #af2020;
+  --ui-bg-danger-hover: #a52020;
+
+  --ui-bg-secondary-active: #928054;
+  --ui-bg-secondary-basic: #b69852;
+  --ui-bg-secondary-hover: #a58f57;
+
+  --ui-text-color-disabled: #666;
 }
 .theme-dark {
   --color-allow: var(--color-green);
@@ -30,6 +45,9 @@
   --color-text: #ddd;
 
   --graphic-opacity: 0.65;
+
+  --ui-bg-color-disabled: #aaa;
+  --ui-text-color-basic: #000;
 }
 .theme-light {
   --color-allow: var(--color-dark-green);
@@ -48,4 +66,7 @@
   --color-text: #000;
 
   --graphic-opacity: 0.85;
+
+  --ui-bg-color-disabled: #eee;
+  --ui-text-color-basic: #fff;
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { BIAS_MODES, MANUAL_MODES, WORKING_MODES } from '@app/models/pve.model';
-import { ERROR_MAP, RegistryType, SettingsType } from '@app/models/settings.model';
+import { ERROR_MAP, RegistryType, SettingsType, VERBOSE_LEVELS } from '@app/models/settings.model';
 import { ConfigService, THEME_DARK, THEME_LIGHT, Theme } from '@app/services/config.service';
 import { I18nService } from '@app/services/i18n.service';
 import { RegistryForm, SettingsForm, SettingsService } from '@app/services/settings.service';
@@ -167,10 +167,24 @@ export class IndexComponent {
   }
 
   /**
+   * Getter urovni „ukecanosti“ spoustece
+   */
+  public get verboseLevels(): readonly string[] {
+    return VERBOSE_LEVELS;
+  }
+
+  /**
    * Getter pracovnich rezimu stridace
    */
   public get workingModes(): readonly string[] {
     return WORKING_MODES;
+  }
+
+  /**
+   * Konstruktor
+   */
+  public constructor() {
+    void this.__settingsSrv.load(); // Vynuti nacteni nastaveni a registru
   }
 
   /**

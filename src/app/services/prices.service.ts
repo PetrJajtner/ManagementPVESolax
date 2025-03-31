@@ -43,7 +43,7 @@ export class PricesService {
         try {
           const
             response = await fetch(API.BuildUrl(endPoint)),
-            prices = await response.json() as Partial<PricesType>,
+            prices = response.ok ? await response.json() as Partial<PricesType> : {},
             data = this.__fixPrices(prices);
           ;
           this.__pricesSg.set(data);

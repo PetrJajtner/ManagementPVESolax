@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/constants.php';
-require_once __DIR__ . '/inverters/solax.php';
+require_once CLASS_INVERTER;
 
 /**
  * Uroven logovani - zadny
@@ -52,24 +52,22 @@ class Trigger {
    * Konstruktor
    */
   public function __construct() {
+    $this->__settings = json_decode(file_get_contents(FILE_SETTINGS), true);
+    $this->__solax = new SolaX($this->__settings);
+
+    if (isset($this->__settings['VerboseLevel'])) {
+      $this->__verboseLevel = +$this->__settings['VerboseLevel'];
+    }
     if (isset($_REQUEST['verbose'])) {
       $this->__verboseLevel = is_numeric($_REQUEST['verbose']) ? +$_REQUEST['verbose'] : LOG_ALL;
     }
-
-    $this->__prices = json_decode(file_get_contents(FILE_PRICES), true);
-    if (!isset($this->__prices['Data'])) {
-      require_once __DIR__ . '/parser.php';
-      exit;
-    }
-
-    $this->__settings = json_decode(file_get_contents(FILE_SETTINGS), true);
-    $this->__solax = new SolaX($this->__settings);
   }
 
   /**
    * Hlavni behova metoda
    */
   public function run() {
+    $this->__checkPrices();
     $this->__checkSmartCharge();
     $this->__checkSmartExport();
     $this->__checkExport();
@@ -79,7 +77,7 @@ class Trigger {
    * Kontrola rizeni exportu
    */
   private function __checkExport() {
-    if (!$this->__isConfigSet($export = $this->__settings['Export'], ['Status', 'OnValue', 'OffValue'])) {
+    if (!$this->__isConfigSet($export = $this->__settings['Export'], ['Status', 'OnValue', 'OffValue', 'UseNegativePrices'])) {
       $this->__log('ExportControl: invalid config', LOG_MESSAGE);
       return;
     }
@@ -89,24 +87,13 @@ class Trigger {
       return; // Rizeni vypnuto
     }
 
-    $workingMode = $this->__solax->getRegistryValue('WorkingMode', false, true);
-    if (!isset($workingMode)) {
-      $this->__log('ExportControl: WorkingMode not loaded', LOG_MESSAGE);
-      return;
-    }
-
-    if ($workingMode !== $this->__solax->WorkingModeSelfUse) {
-      $status = $this->__solax->setRegistryValue('WorkingMode', $this->__solax->WorkingModeSelfUse) ? 'set' : 'failure';
-      $this->__log("ExportControl: WorkingMode '".SolaX::WORKING_MODES[$workingMode]."' -> 'WorkingModeSelfUse' - {$status}", LOG_CHANGE);
-    }
-
     $hour = +date('G');
     if (21 < $hour || 5 > $hour) {
       $this->__log('ExportControl: stopped', LOG_MESSAGE);
       return; // Rizeni mezi 21. a 5. hodinou pozastaveno
     }
 
-    $nextHour = +date('G', strtotime('+15 minutes'));
+    $nextHour = +date('G', strtotime('+10 minutes'));
     if ($hour === $nextHour) {
       $this->__log('ExportControl: skipped', LOG_MESSAGE);
       return;
@@ -122,8 +109,24 @@ class Trigger {
       return;
     }
 
-    $registryValue = $this->__solax->getRegistryValue('ExportControl', false);
-    if (!isset($registryValue)) {
+    if ($export['UseNegativePrices']) {
+      $this->__checkNegativePrice($price, isset($export['UseManual']) ? $export['UseManual'] : false);
+    }
+
+    $workingMode = $this->__solax->getRegistryValue('WorkingMode', false, true);
+    if ($workingMode !== $this->__solax->WorkingModeSelfUse) {
+      $status = $this->__solax->setRegistryValue('WorkingMode', $this->__solax->WorkingModeSelfUse) ? 'set' : 'failure';
+      $this->__log("ExportControl: Working mode '".SolaX::WORKING_MODES[$workingMode]."' -> 'WorkingModeSelfUse' - {$status}", LOG_CHANGE);
+    }
+
+    $biasMode = $this->__solax->getRegistryValue('BiasMode', false);
+    if ($biasMode !== $this->__solax->BiasModeGrid) {
+      $status = $this->__solax->setRegistryValue('BiasMode', $this->__solax->BiasModeGrid) ? 'set' : 'failure';
+      $this->__log("ExportControl: Bias mode '".SolaX::BIAS_MODES[$biasMode]."' -> 'BiasModeGrid' - {$status}", LOG_CHANGE);
+    }
+
+    $exportValue = $this->__solax->getRegistryValue('ExportControl', false);
+    if (!isset($exportValue)) {
       $this->__log('ExportControl: ExportControl value not loaded', LOG_MESSAGE);
       return;
     }
@@ -134,22 +137,130 @@ class Trigger {
       return;
     }
 
-    $currentBias = $this->__solax->getRegistryValue('BiasMode', false);
-    if ($currentBias !== $this->__solax->BiasModeDisabled) {
-      $biasControl = 0 > $price['Price'] ? $this->__solax->BiasModeINV : $this->__solax->BiasModeGrid;
-      if ($currentBias !== $biasControl) {
-        $status = $this->__solax->setRegistryValue('BiasMode', $biasControl) ? 'set' : 'failure';
-        $this->__log("ExportControl: Bias '".SolaX::BIAS_MODES[$currentBias]."' -> '".SolaX::BIAS_MODES[$biasControl]."' - {$status}", LOG_CHANGE);
+    if ($exportValue !== $requiredValue) {
+      $status = $this->__solax->setRegistryValue('ExportControl', $requiredValue) ? 'set' : 'failure';
+      $this->__log("ExportControl: Export {$exportValue} W -> {$requiredValue} W - {$status}", LOG_CHANGE);
+    } else {
+      $this->__log('ExportControl: no change made', LOG_MESSAGE);
+    }
+  }
+
+  /**
+   * Kontrola nacteni cen OTE
+   */
+  private function __checkPrices() {
+    $start = time();
+
+    $this->__prices = json_decode(file_get_contents(FILE_PRICES), true);
+    if (!isset($this->__prices['Data'])) {
+      $this->__log('CheckPrices: loading today\'s prices from OTE and quitting', LOG_MESSAGE);
+      require_once __DIR__ . '/parser.php';
+      exit;
+    }
+
+    $now = time();
+    $prediction = json_decode(file_get_contents(FILE_PREDICTION), true);
+    if (13 <= +date('G', $now) && isset($prediction['Error'])) { // nejdrive ve 13:00 jsou ceny na dalsi den
+      $this->__log('CheckPrices: loading tomorrow\'s prices from OTE', LOG_MESSAGE);
+      ob_start();
+
+      $_REQUEST['json'] = '';
+      $_REQUEST['date'] = date('Y-m-d', strtotime('tomorrow'));
+
+      if (class_exists('PricesParser')) {
+        $pricesParser2 = new PricesParser();
+        $pricesParser2->run();
       } else {
-        $this->__log('ExportControl: Bias unchanged', LOG_MESSAGE);
+        require_once __DIR__ . '/parser.php';
+      }
+
+      $data = ob_get_clean();
+      if ('' === $data) {
+        return $this->__wait($start);
+      }
+
+      $this->__log('CheckPrices: saving tomorrow\'s prices to file', LOG_MESSAGE);
+      file_put_contents(FILE_PREDICTION, $data);
+      $prediction = json_decode($data, true);
+    }
+
+    if (!isset($prediction['Data'])) {
+      return $this->__wait($start);
+    }
+
+    $next = $now + 600; // + 10 minut
+    if (0 === +date('G', $next) && $this->__prices['Date'] < (date('Y-m-d', $next))) { // dalsi den a prices nejsou prediction: prediction -> prices
+      $this->__log('CheckPrices: switching prices', LOG_MESSAGE);
+
+      file_put_contents(FILE_PRICES, toJSON($prediction));
+      $this->__prices = $prediction;
+
+      $prediction = ['Date' => date('Y-m-d', $next + 86400), 'Error' => 'ErrorPricesNotPublishedYet'];
+      file_put_contents(FILE_PREDICTION, toJSON($prediction));
+    }
+
+    if (isset($prediction['Data']) && is_array($prediction['Data']) && 0 < count($prediction['Data'])) {
+      $this->__setChargePrices($prediction['Data']);
+    }
+
+    return $this->__wait($start);
+  }
+
+  /**
+   * Otestuje, zdali jde o zapornou cenu a pokud ano nastavi patricne hodnoty registru
+   */
+  private function __checkNegativePrice(array $price, $useManual = false) {
+    $status = [
+      'BiasMode'      => false,
+      'ExportControl' => false,
+      'ManualMode'    => !$useManual,
+      'WorkingMode'   => !$useManual
+    ];
+
+    $fromGrid = 0 > $price['Price'];
+    if ($fromGrid) {
+      $biasMode = $this->__solax->getRegistryValue('BiasMode', false, true);
+      if ($biasMode !== $this->__solax->BiasModeINV) {
+        $status['BiasMode'] = $this->__solax->setRegistryValue('BiasMode', $this->__solax->BiasModeINV);
+        $statusText = $status['BiasMode'] ? 'set' : 'failure';
+        $this->__log("ExportControl: Bias mode '".SolaX::BIAS_MODES[$biasMode]."' -> 'BiasModeINV' - {$statusText}", LOG_CHANGE);
+      } else {
+        $status['BiasMode'] = true;
+      }
+
+      $exportValue = $this->__solax->getRegistryValue('ExportControl', false);
+      if (0 < $exportValue) {
+        $status['ExportControl'] = $this->__solax->setRegistryValue('ExportControl', 0);
+        $statusText = $status['ExportControl'] ? 'set' : 'failure';
+        $this->__log("ExportControl: Export {$exportValue} W -> 0 W - {$statusText}", LOG_CHANGE);
+      } else {
+        $status['ExportControl'] = true;
+      }
+
+      if ($useManual) {
+        $workingMode = $this->__solax->getRegistryValue('WorkingMode', false);
+        if ($workingMode !== $this->__solax->WorkingModeManual) {
+          $status['WorkingMode'] = $this->__solax->setRegistryValue('WorkingMode', $this->__solax->WorkingModeManual);
+          $statusText = $status['WorkingMode'] ? 'set' : 'failure';
+          $this->__log("ExportControl: Working mode '".SolaX::WORKING_MODES[$workingMode]."' -> 'WorkingModeManual' - {$statusText}", LOG_CHANGE);
+        } else {
+          $status['WorkingMode'] = true;
+        }
+
+        $manualMode = $this->__solax->getRegistryValue('ManualModeCharging', false);
+        if ($manualMode !== $this->__solax->ManualModeChargingOff) {
+          $status['ManualMode'] = $this->__solax->setRegistryValue('ManualModeCharging', $this->__solax->ManualModeChargingOff);
+          $statusText = $status['ManualMode'] ? 'set' : 'failure';
+          $this->__log("ExportControl: Manual mode '".SolaX::MANUAL_MODES[$manualMode]."' -> 'ManualModeChargingOff' - {$statusText}", LOG_CHANGE);
+        } else {
+          $status['ManualMode'] = true;
+        }
       }
     }
 
-    if ($registryValue !== $requiredValue) {
-      $status = $this->__solax->setRegistryValue('ExportControl', $requiredValue) ? 'set' : 'failure';
-      $this->__log("ExportControl: Export {$registryValue} W -> {$requiredValue} W - {$status}", LOG_CHANGE);
-    } else {
-      $this->__log('ExportControl: no change made', LOG_MESSAGE);
+    if ($status['BiasMode'] || $status['ExportControl'] || $status['WorkingMode'] || $status['ManualMode']) {
+      $this->__log('ExportControl: settings for negative price applied', LOG_MESSAGE);
+      exit;
     }
   }
 
@@ -168,6 +279,7 @@ class Trigger {
    *
    * Edit: bohuzel jedna hodina nestaci, nutno pridat dalsi… Jde totiz o to, ze
    * nabijeni zavisi na BMS a teplote akumulatoru:
+   *  18°C ~  12,0 A (*)
    *  18°C ~  18,5 A
    *  19°C ~  21,5 A
    *  20°C ~  22,0 A
@@ -176,33 +288,38 @@ class Trigger {
    * >23°C ~ >25,0 A
    */
   private function __checkSmartCharge() {
-    if (!$this->__isConfigSet($smartCharge = $this->__settings['SmartCharge'], ['HourEnd',  'HourStart', 'MinBatterySoC', 'MonthEnd', 'MonthStart', 'OffPVEPower', 'Status'])) {
+    if (!$this->__isConfigSet($settings = $this->__settings['SmartCharge'], ['HourEnd', 'HourStart', 'MinBatterySoC', 'MonthEnd', 'MonthStart', 'OffPVEPower', 'Status'])) {
       $this->__log('SmartCharge: invalid config', LOG_MESSAGE);
       return;
     }
 
-    if (!$smartCharge['Status']) {
+    if (!$settings['Status']) {
       $this->__log('SmartCharge: off', LOG_MESSAGE);
       return; // Rizeni vypnuto
     }
 
     $month = +date('n');
-    if ($month < $smartCharge['MonthStart'] && $month > $smartCharge['MonthEnd']) { // Musi byt v danem rozsahu roku
+    if ($month < $settings['MonthStart'] && $month > $settings['MonthEnd']) { // Musi byt v danem rozsahu roku
       $this->__log('SmartCharge: not in months range', LOG_MESSAGE);
       return;
     }
 
-    $nextTime = strtotime('+15 minutes');
+    $nextTime = strtotime('+10 minutes');
     $nextHour = +date('G', $nextTime);
     $nextDate = date('Y-m-d', $nextTime);
-    if ($nextHour < $smartCharge['HourStart'] && $nextHour > $smartCharge['HourEnd']) { // Musi byt ve spoustenem intervalu dne
+    if ($nextHour < $settings['HourStart'] && $nextHour > $settings['HourEnd']) { // Musi byt ve spoustenem intervalu dne
       $this->__log('SmartCharge: not in hours range', LOG_MESSAGE);
       return;
     }
 
-    $records = json_decode(file_get_contents(FILE_CHARGE), true);
-    if (null === $records) {
+    $charge = json_decode(file_get_contents(FILE_CHARGE), true);
+    if (null === $charge) {
       $this->__log('SmartCharge: file not loaded', LOG_MESSAGE);
+      return;
+    }
+
+    if (!isset($charge['Data']) || !is_array($charge['Data']) || 0 === count($charge['Data'])) {
+      $this->__log('SmartCharge: prices not loaded', LOG_MESSAGE);
       return;
     }
 
@@ -216,44 +333,42 @@ class Trigger {
       'Hour'  => -1,
       'Price' => 0
     ];
-    foreach ($records as $chargePrice) {
-      if ($nextDate === $chargePrice['Date'] && $nextHour === $chargePrice['Hour']) {
+    foreach ($charge['Data'] as $chargePrice) {
+      if (isset($chargePrice['Date']) && isset($chargePrice['Hour']) && $nextDate === $chargePrice['Date'] && $nextHour === $chargePrice['Hour']) {
         $record = $chargePrice;
         break;
       }
     }
 
     $batterySoC = $this->__solax->getRealValue('BatteryRemainingCapacity', false, true);
-    if ($batterySoC > $smartCharge['MinBatterySoC']) { // SoC aku musi byt nizsi nez MinBatterySoC
+    if ($batterySoC > $settings['MinBatterySoC']) { // SoC aku musi byt nizsi nez MinBatterySoC
       $this->__log("SmartCharge: battery charged - {$batterySoC} %", LOG_MESSAGE);
       $this->__turnOffCharging($status);
       return;
     }
 
     $pvePower = $this->__solax->getRealValue('PV1Power', false) + $this->__solax->getRealValue('PV2Power', false);
-    if ($pvePower >= $smartCharge['OffPVEPower']) { // Vykon nesmi byt vyssi nez OffPVEPower
+    if ($pvePower >= $settings['OffPVEPower']) { // Vykon nesmi byt vyssi nez OffPVEPower
       $this->__log("SmartCharge: too much PVE power - {$pvePower} W", LOG_MESSAGE);
       $this->__turnOffCharging($status);
       return;
     }
 
     if ($nextDate === $record['Date'] && $nextHour === $record['Hour']) { // Zapne nabijeni akumulatoru
-      $sleep = 50;
+      sleep(5);
 
+      $sleep = 15;
       $workingMode = $this->__solax->getRegistryValue('WorkingMode', false, true);
       if ($workingMode !== $this->__solax->WorkingModeManual) { // Kontrola nastaveni manualu
         $status['WorkingMode'] = $this->__solax->setRegistryValue('WorkingMode', $this->__solax->WorkingModeManual);
         $statusText = $status['WorkingMode'] ? 'set' : 'failure';
         $this->__log("SmartCharge: Working mode '".SolaX::WORKING_MODES[$workingMode]."' -> 'WorkingModeManual' - {$statusText}", LOG_CHANGE);
-
-        sleep(10); // 10s
-        $sleep -= 10;
       }
 
       if ($status['WorkingMode']) {
         while ($this->__solax->RunModeNormal !== $this->__solax->getRealValue('RunMode', false, true)) {
-          sleep(20);
-          $sleep -= 20;
+          sleep(5);
+          $sleep -= 5;
         }
       }
 
@@ -293,7 +408,7 @@ class Trigger {
         !$this->__isConfigSet($export = $settings['Export'], ['OnValue', 'Status']) ||
         !$this->__isConfigSet($smartExport = $settings['SmartExport'], [
           'HourEnd', 'HoursBelowThreshold', 'HourStart', 'MinBatterySoC', 'MinPVEPower',
-          'MonthEnd', 'MonthStart', 'PriceMultiplier', 'Status', 'UseNegativePrices'
+          'MonthEnd', 'MonthStart', 'PriceMultiplier', 'Status'
         ])) {
       $this->__log('SmartExport: invalid config', LOG_MESSAGE);
       return;
@@ -310,7 +425,7 @@ class Trigger {
       return;
     }
 
-    $nextHour = +date('G', strtotime('+15 minutes'));
+    $nextHour = +date('G', strtotime('+10 minutes'));
     if ($nextHour < $smartExport['HourStart'] || $nextHour > $smartExport['HourEnd']) { // Musi byt ve spoustenem intervalu dne
       $this->__log('SmartExport: not in hours range', LOG_MESSAGE);
       return;
@@ -373,21 +488,25 @@ class Trigger {
       $status['ExportControl'] = $this->__solax->setRegistryValue('ExportControl', $onValue = $export['OnValue']);
       $statusText = $status['ExportControl'] ? 'set' : 'failure';
       $this->__log("SmartExport: Export {$exportValue} W -> {$onValue} W - {$statusText}", LOG_CHANGE);
+    } else {
+      $status['ExportControl'] = true;
     }
 
     if ($workingMode !== $this->__solax->WorkingModeFeedIn) {
       $status['WorkingMode'] = $this->__solax->setRegistryValue('WorkingMode', $this->__solax->WorkingModeFeedIn);
       $statusText = $status['WorkingMode'] ? 'set' : 'failure';
       $this->__log("SmartExport: WorkingMode '".SolaX::WORKING_MODES[$workingMode]."' -> 'WorkingModeFeedIn' - {$statusText}", LOG_CHANGE);
+    } else {
+      $status['WorkingMode'] = true;
     }
 
-    if (null === $status['ExportControl'] && null === $status['WorkingMode']) {
-      $this->__log('SmartExport: no change made', LOG_MESSAGE);
-      exit;
-    }
-
-    if ($status['ExportControl'] && $status['WorkingMode']) {
+    if ($status['ExportControl'] || $status['WorkingMode']) {
+      $this->__log('SmartExport: all set, quitting', LOG_MESSAGE);
       exit; // zmeny zaznamenany, vse OK -> konec
+    }
+
+    if (!$status['ExportControl'] && !$status['WorkingMode']) {
+      $this->__log('SmartExport: no change made', LOG_MESSAGE);
     }
   }
 
@@ -419,6 +538,72 @@ class Trigger {
   }
 
   /**
+   * Nastavi data chytreho nabijeni
+   */
+  private function __setChargePrices(array $prediction) {
+    if (!$this->__isConfigSet($settings = $this->__settings['SmartCharge'], ['HourEnd', 'HourStart', 'MonthEnd', 'MonthStart', 'PricesCount', 'Status'])) {
+      $this->__log('SmartChargePrices: invalid config', LOG_MESSAGE);
+      return;
+    }
+
+    $today = date('Y-m-d');
+    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+    $charge = json_decode(file_get_contents(FILE_CHARGE), true);
+    $generated = isset($charge['Date']) ? $charge['Date'] === $today : false;
+
+    if (!$settings['Status']) { // Rizeni vypnuto
+      if (!$generated || (isset($charge['Data']) && 0 < count($charge['Data']))) {
+        file_put_contents(FILE_CHARGE, toJSON(['Date' => $today, 'Error' => 'ErrorSmartChargeOff']));
+      }
+      return;
+    }
+
+    $month = +date('n');
+    if ($month < $settings['MonthStart'] && $month > $settings['MonthEnd']) { // Musi byt v danem rozsahu roku
+      if (!$generated) {
+        file_put_contents(FILE_CHARGE, toJSON(['Date' => $today, 'Error' => 'ErrorMonthOutsideSelectedRange']));
+      }
+      return;
+    }
+
+    if (isset($charge['Count']) && isset($charge['Data']) &&
+        $charge['Count'] === count($charge['Data']) &&
+        $charge['Count'] === $settings['PricesCount'] &&
+        $generated) { // Vsechno sedi
+      return;
+    }
+
+    $data = ['Date' => $today, 'Count' => $settings['PricesCount']];
+    $fixPrices = function ($prices, $date) {
+      if (!is_array($prices)) {
+        return null;
+      }
+      return array_map(function ($item) use ($date) {
+        return isset($date, $item['Hour'], $item['Price']) ? ['Date' => $date, 'Hour' => $item['Hour'], 'Price' => $item['Price']] : [];
+      }, $prices);
+    };
+
+    $pricesToday = array_filter($fixPrices($this->__prices, $today) ?? [], function ($record) use ($settings) {
+      return $record['Hour'] >= $settings['HourStart'];
+    });
+    $pricesTomorrow = array_filter($fixPrices($prediction, $tomorrow) ?? [], function ($record) use ($settings) {
+      return $record['Hour'] <= $settings['MonthEnd'];
+    });
+    $prices = array_merge($pricesToday, $pricesTomorrow);
+
+    if (0 === count($prices)) {
+      $data['Error'] = ['ErrorNoDataForGivenHourRange', $settings['HourStart'], $settings['MonthEnd']];
+    } else {
+      usort($prices, function ($recordA, $recordB) {
+        return $recordA['Price'] <=> $recordB['Price'];
+      });
+      $data['Data'] = array_slice($prices, 0, $settings['PricesCount']);
+    }
+
+    file_put_contents(FILE_CHARGE, toJSON($data));
+  }
+
+  /**
    * Vypne nabijeni akumulatoru
    */
   private function __turnOffCharging(array &$status) {
@@ -444,6 +629,18 @@ class Trigger {
 
       sleep(5);
     }
+  }
+
+  /**
+   * Vyckavaci metoda
+   */
+  private function __wait($start, $delay = 45) { // 45s
+    $wait = time() - $start;
+    if ($delay < $wait) {
+      return;
+    }
+
+    sleep($delay - $wait);
   }
 
 }

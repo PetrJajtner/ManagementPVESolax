@@ -51,6 +51,10 @@
     "cs": "Chyba",
     "en": "Error"
   },
+  "ErrorPricesNotPublishedYet": {
+    "cs": "Ceny OTE zatím nebyly zveřejněny",
+    "en": "Prices have not been published yet"
+  },
   "ErrorPageNotFound": {
     "cs": "Požadovaná stránka nebyla nalezena",
     "en": "The requested page was not found"
@@ -71,13 +75,21 @@
     "cs": "O aplikaci",
     "en": "About"
   },
+  "HelpArmVersion": {
+    "cs": "Verze ARM",
+    "en": "ARM version"
+  },
   "HelpBuild": {
     "cs": "Sestavení",
     "en": "Build"
   },
-  "HelpArmVersion": {
-    "cs": "Verze ARM",
-    "en": "ARM version"
+  "HelpClear": {
+    "cs": "Vymazat",
+    "en": "Clear"
+  },
+  "HelpErase": {
+    "cs": "Promazat",
+    "en": "Erase"
   },
   "HelpFirmwareVersion": {
     "cs": "Verze firmware",
@@ -90,6 +102,10 @@
   "HelpMainDSPVersion": {
     "cs": "Hlavní verze DSP",
     "en": "Main DSP version"
+  },
+  "HelpNoData": {
+    "cs": "Žádné záznamy",
+    "en": "No records"
   },
   "HelpNominalInvPower": {
     "cs": "Nom. výkon stř.",
@@ -106,6 +122,10 @@
   "Index": {
     "cs": "Přehled",
     "en": "Overview"
+  },
+  "IndexInfoMessage": {
+    "cs": "Informace",
+    "en": "Information"
   },
   "IndexSVGRadiatorTemperature": {
     "cs": "Teplota chladiče",
@@ -130,6 +150,14 @@
   "IndexMarketPricesPrediction": {
     "cs": "Výsledky dalšího dne",
     "en": "Next day results"
+  },
+  "IndexTableAverageConsumption": {
+    "cs": "Průměrná spotřeba",
+    "en": "Average consumption"
+  },
+  "IndexTableAverageConsumptionAbbr": {
+    "cs": "Prům. sp.",
+    "en": "Avg. cons."
   },
   "IndexTableAverageInKWH": {
     "cs": "Průměr (Kč/kWh)",
@@ -182,6 +210,14 @@
   "IndexTableModeInverter": {
     "cs": "Režim střídače",
     "en": "Inverter mode"
+  },
+  "IndexTablePerDay": {
+    "cs": "Za den",
+    "en": "Per day"
+  },
+  "IndexTablePerYear": {
+    "cs": "Za rok",
+    "en": "Per year"
   },
   "IndexTablePriceInKWH": {
     "cs": "Cena (Kč/kWh)",
@@ -366,6 +402,22 @@
     "cs": "Přetoky zapnuty",
     "en": "Overflows enabled"
   },
+  "SettingsExportUseManual": {
+    "cs": "Používat manuální režim",
+    "en": "Use inverter manual mode"
+  },
+  "SettingsExportUseManualNote": {
+    "cs": "V případě povolení použití záporných cen přepne střídač do manuálního režimu",
+    "en": "In case the use of negative prices is allowed, the inverter will be switched to manual mode"
+  },
+  "SettingsExportUseNegativePrices": {
+    "cs": "Povolit použití záporných cen",
+    "en": "Allow using of negative prices"
+  },
+  "SettingsExportUseNegativePricesNote": {
+    "cs": "V případě zaškrtnutí políčka a současně záporných cen energie bude střídač čerpat energii ze sítě, a to až do nastavené hodnoty BIAS.",
+    "en": "If the checkbox is ticked and the energy prices are negative, the inverter will draw energy from the grid, up to the set BIAS value."
+  },
   "SettingsFailedToSaveRegistry": {
     "cs": "Hodnoty registrů se nepodařilo uložit.",
     "en": "Failed to save register values."
@@ -470,10 +522,6 @@
     "cs": "Násobek min. výkupní ceny",
     "en": "Min. purchase price multiplier"
   },
-  "SettingsSmartExportUseNegativePrices": {
-    "cs": "Povolit použití záporných cen",
-    "en": "Allow using of negative prices"
-  },
   "SettingsSpotControlled": {
     "cs": "podle spotových cen",
     "en": "according to spot prices"
@@ -482,6 +530,10 @@
     "cs": "Povolit řízení",
     "en": "Allow management"
   },
+  "SettingsSystemDate": {
+    "cs": "Datum spuštění systému",
+    "en": "System start-up date"
+  },
   "SettingsSystemName": {
     "cs": "Název instalace",
     "en": "Installation name"
@@ -489,10 +541,6 @@
   "SettingsSystemSize": {
     "cs": "Velikost systému",
     "en": "System size"
-  },
-  "SettingsTax": {
-    "cs": "Daň (jako násobek)",
-    "en": "Tax (as a multiple)"
   },
   "SettingsTestConnection": {
     "cs": "Otestovat spojení",
@@ -545,6 +593,26 @@
   "SettingsUnitWatt": {
     "cs": "W",
     "en": "W"
+  },
+  "SettingsVerboseLevel": {
+    "cs": "Úroveň logu spouštěče",
+    "en": "Trigger log level"
+  },
+  "SettingsVerboseLevelAll": {
+    "cs": "vše",
+    "en": "all"
+  },
+  "SettingsVerboseLevelChange": {
+    "cs": "změny",
+    "en": "changes"
+  },
+  "SettingsVerboseLevelMessage": {
+    "cs": "zprávy",
+    "en": "messages"
+  },
+  "SettingsVerboseLevelNone": {
+    "cs": "nezaznamenávat",
+    "en": "do not log"
   },
   "WorkingMode": {
     "cs": "Pracovní režim",

@@ -4,28 +4,28 @@
     "not dead"
   ],
   "dependencies": {
-    "@angular/common": "19.1.5",
-    "@angular/compiler": "19.1.5",
-    "@angular/core": "19.1.5",
-    "@angular/forms": "19.1.5",
-    "@angular/platform-browser": "19.1.5",
-    "@angular/router": "19.1.5",
-    "rxjs": "7.8.1",
+    "@angular/common": "19.2.4",
+    "@angular/compiler": "19.2.4",
+    "@angular/core": "19.2.4",
+    "@angular/forms": "19.2.4",
+    "@angular/platform-browser": "19.2.4",
+    "@angular/router": "19.2.4",
+    "rxjs": "7.8.2",
     "tslib": "2.8.1",
     "zone.js": "0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "19.1.6",
-    "@angular/cli": "19.1.6",
-    "@angular/compiler-cli": "19.1.5",
-    "@angular/language-service": "19.1.5",
-    "@stylistic/eslint-plugin": "3.1.0",
-    "@typescript-eslint/parser": "8.24.0",
-    "angular-eslint": "19.1.0",
-    "eslint": "9.20.0",
+    "@angular/build": "19.2.5",
+    "@angular/cli": "19.2.5",
+    "@angular/compiler-cli": "19.2.4",
+    "@angular/language-service": "19.2.4",
+    "@stylistic/eslint-plugin": "4.2.0",
+    "@typescript-eslint/parser": "8.28.0",
+    "angular-eslint": "19.3.0",
+    "eslint": "9.23.0",
     "pretty": "2.0.0",
-    "typescript": "5.7.3",
-    "typescript-eslint": "8.24.0"
+    "typescript": "5.8.2",
+    "typescript-eslint": "8.28.0"
   },
   "name": "solax",
   "private": true,
@@ -45,6 +45,5 @@
     "lint": "ng lint"
   },
   "type": "module",
-  "version": "1.0.19-28"
+  "version": "1.0.19-29"
 }
-

@@ -126,6 +126,7 @@ export type RealTimeData = {
   Grid3Power?:                  Measurement;
   Grid3Voltage?:                Measurement;
   GridPower?:                   Measurement;
+  Id?:                          string;
   LoadPower?:                   Measurement;
   PV1Current?:                  Measurement;
   PV1Power?:                    Measurement;

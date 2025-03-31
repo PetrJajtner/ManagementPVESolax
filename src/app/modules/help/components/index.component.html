@@ -1,4 +1,4 @@
-<h1>{{'Help'|translate}}</h1>
+<h1 (click)="loadOutput()" aria-hidden="true">{{'Help'|translate}}</h1>
 <fieldset>
   <legend>{{'HelpAbout'|translate}}</legend>
 
@@ -66,4 +66,29 @@
     </p>
   }
 
+  @let output = outputSg();
+  @if (undefined !== output) {
+    <hr />
+
+    @if (0 === output.length) {
+      <p class="plain-text"><em>{{'HelpNoData'|translate}}</em></p>
+    }
+    @if (0 < output.length) {
+      <p class="plain-text">{{output}}</p>
+    }
+    @if (1 < output.length) {
+      <p class="space-between">
+        <button (click)="eraseOutput()"
+                class="secondary"
+                type="button">
+          {{'HelpErase'|translate}}
+        </button>
+        <button (click)="clearOutput()"
+                class="danger"
+                type="button">
+          {{'HelpClear'|translate}}
+        </button>
+      </p>
+    }
+  }
 </fieldset>

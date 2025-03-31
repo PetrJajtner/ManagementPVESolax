@@ -69,6 +69,17 @@
                   }
                 </p>
               }
+              @if (system.controls['Date']; as date) {
+                <p>
+                  <label for="Date">{{'SettingsSystemDate'|translate}}:</label>
+                  <input [formControl]="date"
+                         id="Date"
+                         type="date" />
+                  @if (date.errors) {
+                    <span class="error">{{date.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
             }
             @if (data.settingsForm.controls['SupplyPoint']; as supplyPoint) {
               <p>
@@ -136,9 +147,22 @@
               <p>
                 <button (click)="testConnection(data.settingsForm)"
                         [disabled]="!data.settingsForm.controls['DongleID'].valid || !data.settingsForm.controls['Location'].valid"
+                        class="secondary"
                         type="button">
                   {{'SettingsTestConnection'|translate}}
                 </button>
+              </p>
+            }
+            @if (data.settingsForm.controls['VerboseLevel']; as verboseLevel) {
+              <p>
+                <label for="VerboseLevel">{{'SettingsVerboseLevel'|translate}}:</label>
+                <select [formControl]="verboseLevel"
+                        id="VerboseLevel">
+                  @for (level of verboseLevels; let index = $index; track index) {
+                    <option [attr.selected]="+verboseLevel.value === index ? 'selected' : undefined"
+                            [attr.value]="index">{{level|translate}}</option>
+                  }
+                </select>
               </p>
             }
           </div>
@@ -160,45 +184,6 @@
                 }
               </p>
             }
-            <!--@if (data.settingsForm.controls['Tax']; as tax) {
-              <p>
-                <label for="Tax">{{'SettingsTax'|translate}}:</label>
-                <input [formControl]="tax"
-                       id="Tax"
-                       type="number" />
-                @if (tax.errors) {
-                  <span class="error">{{tax.errors|errors:errorMap}}</span>
-                }
-              </p>
-            }
-            @if (data.settingsForm.controls['Distribution']; as distribution) {
-              <div class="distribution">
-                @if (distribution.controls['ConsumptionMultiplier']; as consumptionMultiplier) {
-                  <p>
-                    <label for="ConsumptionMultiplier">{{'SettingsDistributionConsumptionMultiplier'|translate}}:</label>
-                    <input [formControl]="consumptionMultiplier"
-                           id="ConsumptionMultiplier"
-                           type="number" />
-                    {{'SettingsUnitCurrency'|translate}}
-                    @if (consumptionMultiplier.errors) {
-                      <span class="error">{{consumptionMultiplier.errors|errors:errorMap}}</span>
-                    }
-                  </p>
-                }
-                @if (distribution.controls['FixPrice']; as fixPrice) {
-                  <p>
-                    <label for="FixPrice">{{'SettingsDistributionFixPrice'|translate}}:</label>
-                    <input [formControl]="fixPrice"
-                           id="FixPrice"
-                           type="number" />
-                    {{'SettingsUnitCurrency'|translate}}
-                    @if (fixPrice.errors) {
-                      <span class="error">{{fixPrice.errors|errors:errorMap}}</span>
-                    }
-                  </p>
-                }
-              </div>
-            }-->
           </div>
         </fieldset>
 
@@ -244,6 +229,42 @@
                   {{'SettingsUnitWatt'|translate}}
                   @if (offValue.errors) {
                     <span class="error">{{offValue.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['UseNegativePrices']; as useNegativePrices) {
+                <p>
+                  <label [attr.title]="'SettingsExportUseNegativePricesNote'|translate"
+                         for="UseNegativePrices">{{'SettingsExportUseNegativePrices'|translate}}:</label>
+                  @if (export.controls['Status'].value) {
+                    <input [formControl]="useNegativePrices"
+                           id="UseNegativePrices"
+                           type="checkbox" />
+                  } @else {
+                    <input [formControl]="useNegativePrices"
+                           id="UseNegativePrices"
+                           type="hidden" />
+                    <input [attr.checked]="useNegativePrices.value ? 'true' : null"
+                           disabled="true"
+                           type="checkbox" />
+                  }
+                </p>
+              }
+              @if (export.controls['UseManual']; as useManual) {
+                <p>
+                  <label [attr.title]="'SettingsExportUseManualNote'|translate"
+                         for="UseManual">{{'SettingsExportUseManual'|translate}}:</label>
+                  @if (export.controls['Status'].value && export.controls['UseNegativePrices'].value) {
+                    <input [formControl]="useManual"
+                           id="UseManual"
+                           type="checkbox" />
+                  } @else {
+                    <input [formControl]="useManual"
+                           id="UseNegativePrices"
+                           type="hidden" />
+                    <input [attr.checked]="useManual.value ? 'true' : null"
+                           disabled="true"
+                           type="checkbox" />
                   }
                 </p>
               }
@@ -397,23 +418,6 @@
                   }
                 </p>
               }
-              <!--@if (smartExport.controls['UseNegativePrices']; as useNegativePrices) {
-                <p>
-                  <label for="UseNegativePrices">{{'SettingsSmartExportUseNegativePrices'|translate}}:</label>
-                  @if (smartExport.controls['Status'].value) {
-                    <input [formControl]="useNegativePrices"
-                           id="UseNegativePrices"
-                           type="checkbox" />
-                  } @else {
-                    <input [formControl]="useNegativePrices"
-                           id="UseNegativePrices"
-                           type="hidden" />
-                    <input [attr.checked]="useNegativePrices.value ? 'true' : null"
-                           disabled="true"
-                           type="checkbox" />
-                  }
-                </p>
-              }-->
             </div>
           </fieldset>
         }
@@ -563,6 +567,7 @@
           }}</button>
           <button (click)="data.settingsForm.reset(data.settingsData)"
                   [disabled]="!data.settingsForm.dirty"
+                  class="secondary"
                   type="button">{{
             'SettingsReset'|translate
           }}</button>
@@ -584,8 +589,6 @@
             action="#">
 
         <div class="settings-block">
-
-          @let settings = data.settingsForm.value;
           <fieldset>
             <legend>{{'SettingsBasic'|translate}}</legend>
 
@@ -656,14 +659,13 @@
             @if (data.registryForm.controls['ExportControl']; as exportControl) {
               <p>
                 <label for="RegistryExportControl">{{'SettingsRegistryExportControl'|translate}}:</label>
-                <input [attr.disabled]="settings.Export!.Status || settings.SmartExport!.Status ? 'readonly' : null"
-                       [formControl]="exportControl"
+                <input [formControl]="exportControl"
                        id="RegistryExportControl"
                        type="number" />
                 {{'SettingsUnitWatt'|translate}}
                 &nbsp;
                 <button (click)="saveRegistry({ExportControl: exportControl.value})"
-                        [disabled]="settings.Export!.Status || settings.SmartExport!.Status ? true : !exportControl.dirty"
+                        [disabled]="!exportControl.dirty"
                         data-type="submit"
                         type="button">{{
                   'SettingsSave'|translate
@@ -704,6 +706,7 @@
             }}</button>
             <button (click)="data.registryForm.reset(data.registryData)"
                     [disabled]="!data.registryForm.dirty"
+                    class="secondary"
                     type="button">{{
               'SettingsReset'|translate
             }}</button>

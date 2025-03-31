@@ -84,7 +84,7 @@ export class ConfigService {
       try {
         const
           response = await fetch(JSON_CONFIG),
-          data = await response.json() as Config
+          data = response.ok ? await response.json() as Config : {}
         ;
         if ('AvailableLanguages' in data && isArray(data.AvailableLanguages) && data.AvailableLanguages?.length) {
           this.__availableLanguages = new Set(data.AvailableLanguages.map((lang: string) => `${lang}`.trim().toLowerCase()));

@@ -1,9 +1,11 @@
-options -indexes
+Options -Indexes -MultiViews
 
 RewriteEngine On
 
+RewriteRule ^charge$     ./endpoint.php?action=charge [L]
 RewriteRule ^connection$ ./endpoint.php?action=connection [L]
 RewriteRule ^live-data$  ./endpoint.php?action=live-data [L]
+RewriteRule ^output$     ./endpoint.php?action=output [L]
 RewriteRule ^prediction$ ./endpoint.php?action=prediction [L]
 RewriteRule ^prices$     ./endpoint.php?action=prices [L]
 RewriteRule ^registry$   ./endpoint.php?action=registry [L]

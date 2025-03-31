@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tridy pro zpracovani dat ze stridacu Solax
+ * Tridy maket (testovacích objektů) pro zpracovani dat ze stridacu Solax
  *
  * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
  * @copyright  Ing. Petr Jajtner 2024 - nyni
@@ -9,9 +9,100 @@
 require_once dirname(__DIR__).'/constants.php';
 
 /**
- * Abstraktni trida pro tvorbu dalsich typu stridacu SolaX
+ * Maketa tridy typu SolaX X3-Hybrid-G4
  */
-abstract class SolaXInverter {
+class X3HybridG4 {
+
+/**
+   * Rezimy akumulatoru
+   */
+  public const BATTERY_MODES = [
+    0 => 'BatteryModeSelfUse',       // Rezim vlastni spotreby
+    1 => 'BatteryModeForceTimeUse',  // Manualni rezim
+    2 => 'BatteryModeBackUp',        // Rezim zalohy
+    3 => 'BatteryModeFeedinPriority' // Priorita dodavky do site'
+  ];
+
+  /**
+   * Behove rezimy stridace
+   */
+  public const RUN_MODES = [
+     0 => 'RunModeWaiting',        // Cekani
+     1 => 'RunModeChecking',       // Kontrola
+     2 => 'RunModeNormal',         // Normalni provoz
+     3 => 'RunModeFault',          // Porucha
+     4 => 'RunModePermanentFault', // Trvala porucha
+     5 => 'RunModeUpdating',       // Aktualizace
+     6 => 'RunModeEPSCheck',       // Kontrola EPS
+     7 => 'RunModeEPS',            // Rezim EPS
+     8 => 'RunModeSelfTest',       // Autotest
+     9 => 'RunModeIdle',           // Rezim necinnosti
+    10 => 'RunModeStandby'         // Pohotovostni rezim
+  ];
+
+  /**
+   * Senzory stridace
+   */
+  private const SENSORS = [
+                                  // [     index,  jednotka, prevod]
+    'Grid1Voltage'                => [         0,       'V', '_div10'],
+    'Grid2Voltage'                => [         1,       'V', '_div10'],
+    'Grid3Voltage'                => [         2,       'V', '_div10'],
+    'Grid1Current'                => [         3,       'A', '_toSignedDiv10'],
+    'Grid2Current'                => [         4,       'A', '_toSignedDiv10'],
+    'Grid3Current'                => [         5,       'A', '_toSignedDiv10'],
+    'Grid1Power'                  => [         6,       'W', '_toSigned'],
+    'Grid2Power'                  => [         7,       'W', '_toSigned'],
+    'Grid3Power'                  => [         8,       'W', '_toSigned'],
+    'ACPowerTotal'                => [         9,       'W', '_toSigned'], // Soucet hodnot na indexu 6 + 7 + 8
+    'PV1Voltage'                  => [        10,       'V', '_div10'],
+    'PV2Voltage'                  => [        11,       'V', '_div10'],
+    'PV1Current'                  => [        12,       'A', '_div10'],
+    'PV2Current'                  => [        13,       'A', '_div10'],
+    'PV1Power'                    => [        14,       'W'],
+    'PV2Power'                    => [        15,       'W'],
+    'Grid1Frequency'              => [        16,       'HZ', '_div100'],
+    'Grid2Frequency'              => [        17,       'HZ', '_div100'],
+    'Grid3Frequency'              => [        18,       'HZ', '_div100'],
+    'RunMode'                     => [        19,     'NONE'],
+    'RunModeText'                 => [        19,     'NONE', '_runMode'],
+    'EPS1Voltage'                 => [        23,       'V', '_div10'],
+    'EPS2Voltage'                 => [        24,       'V', '_div10'],
+    'EPS3Voltage'                 => [        25,       'V', '_div10'],
+    'EPS1Current'                 => [        26,       'A', '_toSignedDiv10'],
+    'EPS2Current'                 => [        27,       'A', '_toSignedDiv10'],
+    'EPS3Current'                 => [        28,       'A', '_toSignedDiv10'],
+    'EPS1Power'                   => [        29,       'W', '_toSigned'],
+    'EPS2Power'                   => [        30,       'W', '_toSigned'],
+    'EPS3Power'                   => [        31,       'W', '_toSigned'],
+    'GridPower'                   => [  [34, 35],       'W', '_toSigned32'],
+    'BatteryCurrent'              => [        40,       'A', '_toSignedDiv100'],
+    'BatteryPower'                => [        41,       'W', '_toSigned'],
+    'BMSStatus'                   => [        45,    'NONE'],
+    'RadiatorTemperatureInner'    => [        46,       'C', '_toSigned'],
+    'LoadPower'                   => [        47,       'W', '_toSigned'],
+    'RadiatorTemperature'         => [        54,       'C', '_toSigned'],
+    'YieldTotal'                  => [  [68, 69],     'KWH', '_div10'],
+    'YieldToday'                  => [        70,     'KWH', '_div10'], // Vcetne vykonu z akumulatoru
+    'BatteryDischargeEnergyTotal' => [  [74, 75],     'KWH', '_div10'],
+    'BatteryChargeEnergyTotal'    => [  [76, 77],     'KWH', '_div10'],
+    'BatteryDischargeEnergyToday' => [        78,     'KWH', '_div10'],
+    'BatteryChargeEnergyToday'    => [        79,     'KWH', '_div10'],
+    'PVEnergyTotal'               => [  [80, 81],     'KWH', '_div10'],
+    'PVETodayYield'               => [        82,     'KWH', '_div10'], // Vykon z panelu
+    'EPSEnergyTotal'              => [  [83, 84],     'KWH', '_div10'],
+    'EPSEnergyToday'              => [        85,     'KWH', '_div10'],
+    'FeedInEnergyTotal'           => [  [86, 87],     'KWH', '_div100'],
+    'ConsumedEnergyTotal'         => [  [88, 89],     'KWH', '_div100'],
+    'FeedInEnergyToday'           => [  [90, 91],     'KWH', '_div100'],
+    'ConsumedEnergyToday'         => [  [92, 93],     'KWH', '_div100'],
+    'BatteryRemainingCapacity'    => [       103, 'PERCENT'],
+    'BatteryTemperature'          => [       105,       'C', '_toSigned'],
+    'BatteryRemainingEnergy'      => [       106,     'KWH', '_div10'],
+    'BatteryMode'                 => [       168,    'NONE'],
+    'BatteryModeText'             => [       168,    'NONE', '_batteryMode'],
+    'BatteryVoltage'              => [[169, 170],       'V', '_div100']
+  ];
 
   /**
    * Pocet desetinnych mist
@@ -29,23 +120,82 @@ abstract class SolaXInverter {
   protected const INT32_MAX = 0x7FFFFFFF;
 
   /**
+   * Vrati hodnoty klicu poli
+   */
+  public function __get($name) {
+    if (in_array($name, self::BATTERY_MODES)) {
+      return array_search($name, self::BATTERY_MODES);
+    }
+    if (in_array($name, self::RUN_MODES)) {
+      return array_search($name, self::RUN_MODES);
+    }
+    return null;
+  }
+
+  /**
    * Vrati textovy popis rezimu
    *
    * @param string $key    Klic rezimu
    * @param string $value  Ciselna hodnota rezimu
    * @return string        Textovy popis
    */
-  abstract public function getMode($key, $value);
+  public function getMode($key, $value) {
+    if ('BatteryMode' === $key) {
+      return $this->_batteryMode($value);
+    }
+    if ('RunMode' === $key) {
+      return $this->_runMode($value);
+    }
+    return 'Unknown';
+  }
 
   /**
-   * Na zaklade hodnot, predanych klicu a priznaku pridani jednotky vrati transformovane hodnoty
+   * Na zaklade dat, predanych klicu a priznaku pridani jednotky vrati transformovane hodnoty
    *
-   * @param array $values  Namerene hodnoty stridace
-   * @param ?array $keys   Upravi vystup na pozadovane klice
-   * @param ?bool $unit    Priznak pro vraceni jednotek, NULL pro oddeleni hodnoty a jednotky
-   * @return array         Vraci pozadovana transformovana data stridace
+   * @param array $data   Namerena data stridace
+   * @param ?array $keys  Upravi vystup na pozadovane klice
+   * @param ?bool $unit   Priznak pro vraceni jednotek, NULL pro oddeleni hodnoty a jednotky
+   * @return array        Vraci pozadovana transformovana data stridace
    */
-  abstract public function parse(array $values, array $keys = null, $unit = true);
+  public function parse(array $data, array $keys = null, $unit = true) {
+    $result = [];
+    if (!isset($keys) || (is_array($keys) && 0 === count($keys))) {
+      $keys = array_keys(self::SENSORS);
+    }
+
+    foreach ($keys as $key) {
+      if (!array_key_exists($key, self::SENSORS) || !isset(self::SENSORS[$key])) {
+        continue;
+      }
+
+      $value = 0;
+      $manipulation = self::SENSORS[$key];
+      if (is_numeric($manipulation[0]) && array_key_exists($manipulation[0], $data)) {
+        $value = $data[$manipulation[0]];
+      }
+      if (is_array($manipulation[0])) {
+        $values = array();
+        foreach ($manipulation[0] as $index => $sensorKey) {
+          $values[$index] = array_key_exists($sensorKey, $data) ? $data[$sensorKey] : 0;
+        }
+        $value = $this->_packU16(...$values);
+      }
+      if (isset($manipulation[2])) {
+        $value = $this->{$manipulation[2]}($value);
+      }
+      if ($unit && isset($manipulation[1]) && array_key_exists($manipulation[1], SolaX::UNITS)) {
+        $value .= SolaX::UNITS[$manipulation[1]];
+      }
+      if (null === $unit) {
+        $u = isset(SolaX::UNITS[$manipulation[1]]) && SolaX::UNITS[$manipulation[1]] ? SolaX::UNITS[$manipulation[1]] : null;
+        $v = is_numeric($value) ? round($value, self::DECIMAL_PLACES) : $value;
+        $value = ['value' => $v, 'unit' => $u];
+      }
+      $result[$key] = $value;
+    }
+
+    return $result;
+  }
 
   /**
    * Na zaklade informaci vrati verze stridace
@@ -53,7 +203,30 @@ abstract class SolaXInverter {
    * @param array $info  Informace o stridaci
    * @return array       Vraci verze stridace
    */
-  abstract public function parseVersion(array $info);
+  public function parseVersion(array $info) {
+    return [
+      'NominalInvPower' => ['value' => $info[0], 'unit' => 'kW'],
+      'InvSerialNumber' => "{$info[2]}",
+      'ArmVersion'      => implode('–', [
+        $this->__fixVersionNumber("{$info[6]}"),
+        $this->__fixVersionNumber("{$info[7]}"),
+      ]),
+      'MainDSPVersion'  => $this->__fixVersionNumber("{$info[4]}"),
+      'SlaveDSPVersion' => $this->__fixVersionNumber("{$info[5]}")
+    ];
+  }
+
+  /**
+   * Vrati textovy popis rezimu akumulatoru
+   *
+   * @param int $value
+   * @return string
+   */
+  protected function _batteryMode($value) {
+    return array_key_exists($value, self::BATTERY_MODES)
+            ? self::BATTERY_MODES[$value]
+            : 'BatteryModeUnknown';
+  }
 
   /**
    * Vydeli cislo 10
@@ -76,6 +249,18 @@ abstract class SolaXInverter {
   }
 
   /**
+   * Upravi cislo verze na X.YY
+   *
+   * @param string $value
+   * @return string
+   */
+  private function __fixVersionNumber($value) {
+    $parts = array_pad(explode('.', $value, 2), 2, '0');
+    $parts[1] = str_pad($parts[1], 2, '0');
+    return "{$parts[0]}.{$parts[1]}";
+  }
+
+  /**
    * Rozbali (typicky) dva registry na cele kladne 16bit cislo
    *
    * @param int $value
@@ -89,6 +274,18 @@ abstract class SolaXInverter {
       $shift *= 2 ** 16;
     }
     return $result;
+  }
+
+  /**
+   * Vrati textovy popis rezimu stridace
+   *
+   * @param int $value
+   * @return string
+   */
+  protected function _runMode($value) {
+    return array_key_exists($value, self::RUN_MODES)
+            ? self::RUN_MODES[$value]
+            : 'RunModeUnknown';
   }
 
   /**
@@ -212,7 +409,7 @@ class SolaX {
    * Typy stridacu
    */
   private const TYPES = [
-    14 => ['x3_hybrid_g4.php', 'X3HybridG4']
+    14 => ['mock-up.php', 'X3HybridG4']
   ];
 
   /**
@@ -339,6 +536,29 @@ class SolaX {
   }
 
   /**
+   * Vrati verze stridace
+   */
+  public function readVersion() {
+    $json = file_get_contents(__DIR__.'/mock-up.json');
+    $data = json_decode($json, true);
+
+    $realData = $data['readRealData'];
+    if (!is_array($realData) || !array_key_exists('sn', $realData) ||
+        !array_key_exists('ver', $realData) || !is_array($realData['Information'])) {
+      return [];
+    }
+
+    $inverter = $this->__getInverter($realData['type']);
+    return array_merge(
+      $inverter->parseVersion($realData['Information']),
+      [
+        'RegistrationNumber' => $realData['sn'],
+        'FirmwareVersion'    => $realData['ver']
+      ]
+    );
+  }
+
+  /**
    * Vrati aktualni data hodnot senzoru ze SolaX
    *
    * @param ?array $keys  Upravi vystup na pozadovane klice
@@ -346,25 +566,10 @@ class SolaX {
    * @return array        Vraci pozadovana transformovana data stridace
    */
   public function readRealData(array $keys = null, $unit = true) {
-    $context = stream_context_create([
-      'http' => [
-        'method'  => 'POST',
-        'header'  => 'Content-Type: application/json',
-        'content' => "optType=ReadRealTimeData&pwd={$this->__dongleID}"
-      ]
-    ]);
+    $json = file_get_contents(__DIR__.'/mock-up.json');
+    $data = json_decode($json, true);
 
-    $response = false;
-    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
-      $response = @file_get_contents($this->__location, false, $context);
-      if ($response && false !== strpos($response, '"type":') && false !== strpos($response, '"Data":[')) {
-        break;
-      } else {
-        sleep(5);
-      }
-    }
-
-    $realData = json_decode($response, true);
+    $realData = $data['readRealData'];
     if (!is_array($realData) || !array_key_exists('type', $realData) ||
         !array_key_exists($realData['type'], self::TYPES) ||
         !array_key_exists('Data', $realData) || !is_array($realData['Data'])) {
@@ -383,25 +588,10 @@ class SolaX {
    * @return array        Vraci pozadovane transformovana data stridace
    */
   public function readSetData(array $keys = null, $unit = true) {
-    $context = stream_context_create([
-      'http' => [
-        'method'  => 'POST',
-        'header'  => 'Content-Type: application/json',
-        'content' => "optType=ReadSetData&pwd={$this->__dongleID}"
-      ]
-    ]);
+    $json = file_get_contents(__DIR__.'/mock-up.json');
+    $data = json_decode($json, true);
 
-    $response = false;
-    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
-      $response = @file_get_contents($this->__location, false, $context);
-      if ($response && preg_match('/^\[-?\d+(,-?\d+)*\]$/', $response)) {
-        break;
-      } else {
-        sleep(5);
-      }
-    }
-
-    $setData = json_decode($response, true);
+    $setData = $data['readSetData'];
     if ($setData) {
       array_unshift($setData, -1); // posun pole, aby bylo indexovano od 1
     } else {
@@ -444,44 +634,6 @@ class SolaX {
   }
 
   /**
-   * Vrati verze stridace
-   */
-  public function readVersion() {
-    $context = stream_context_create([
-      'http' => [
-        'method'  => 'POST',
-        'header'  => 'Content-Type: application/json',
-        'content' => "optType=ReadRealTimeData&pwd={$this->__dongleID}"
-      ]
-    ]);
-
-    $response = false;
-    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
-      $response = @file_get_contents($this->__location, false, $context);
-      if ($response && false !== strpos($response, '"sn":') && false !== strpos($response, '"ver":')) {
-        break;
-      } else {
-        sleep(5);
-      }
-    }
-
-    $realData = json_decode($response, true);
-    if (!is_array($realData) || !array_key_exists('sn', $realData) ||
-        !array_key_exists('ver', $realData) || !is_array($realData['Information'])) {
-      return [];
-    }
-
-    $inverter = $this->__getInverter($realData['type']);
-    return array_merge(
-      $inverter->parseVersion($realData['Information']),
-      [
-        'RegistrationNumber' => $realData['sn'],
-        'FirmwareVersion'    => $realData['ver']
-      ]
-    );
-  }
-
-  /**
    * Nastavi hodnotu registru
    */
   public function setRegistryValue($registryKey, $value) {
@@ -495,35 +647,22 @@ class SolaX {
       $converted *= $multiplier;
     }
 
-    $data = json_encode([
-      'num' => 1,
-      'Data' => [[
-        'reg' => is_numeric($registryKey) ? $registryKey : self::REGISTRY[$registryKey][0],
-        'val' => "{$converted}"
-      ]]
-    ]);
-    $context = stream_context_create([
-      'http' => [
-        'method'  => 'POST',
-        'header'  => 'Content-Type: application/json',
-        'content' => "optType=setReg&pwd={$this->__dongleID}&data={$data}"
-      ]
-    ]);
+    $setDataKey = is_numeric($registryKey) ? $registryKey : self::REGISTRY[$registryKey][0];
+    $setDataValue = +"{$converted}";
 
-    $response = false;
-    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
-      $response = @file_get_contents($this->__location, false, $context);
-      if ($response) {
-        break;
-      } else {
-        sleep(5);
-      }
-    }
+    $json = file_get_contents(__DIR__.'/mock-up.json');
+    $data = json_decode($json);
 
-    if (false !== $response) {
-      return -1 < stripos($response, 'success');
-    }
-    return false;
+    $setData = $data['readSetData'];
+    array_unshift($setData, 0);
+
+    $setData[$setDataKey] = $setDataValue;
+    unset($setData[0]);
+
+    $data['readSetData'] = $setData;
+    $result = file_put_contents(__DIR__.'/mock-up.json', toJSON($data));
+
+    return false !== $result;
   }
 
   /**

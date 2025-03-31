@@ -339,44 +339,6 @@ class SolaX {
   }
 
   /**
-   * Vrati verze stridace
-   */
-  public function readVersion() {
-    $context = stream_context_create([
-      'http' => [
-        'method'  => 'POST',
-        'header'  => 'Content-Type: application/json',
-        'content' => "optType=ReadRealTimeData&pwd={$this->__dongleID}"
-      ]
-    ]);
-
-    $response = false;
-    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
-      $response = @file_get_contents($this->__location, false, $context);
-      if ($response) {
-        break;
-      } else {
-        sleep(5);
-      }
-    }
-
-    $realData = json_decode($response, true);
-    if (!is_array($realData) || !array_key_exists('sn', $realData) ||
-        !array_key_exists('ver', $realData) || !is_array($realData['Information'])) {
-      return [];
-    }
-
-    $inverter = $this->__getInverter($realData['type']);
-    return array_merge(
-      $inverter->parseVersion($realData['Information']),
-      [
-        'RegistrationNumber' => $realData['sn'],
-        'FirmwareVersion'    => $realData['ver']
-      ]
-    );
-  }
-
-  /**
    * Vrati aktualni data hodnot senzoru ze SolaX
    *
    * @param ?array $keys  Upravi vystup na pozadovane klice
@@ -395,7 +357,7 @@ class SolaX {
     $response = false;
     for ($i = 0; $i < self::ATTEMPTS; ++$i) {
       $response = @file_get_contents($this->__location, false, $context);
-      if ($response) {
+      if ($response && false !== strpos($response, '"type":') && false !== strpos($response, '"Data":[')) {
         break;
       } else {
         sleep(5);
@@ -432,7 +394,7 @@ class SolaX {
     $response = false;
     for ($i = 0; $i < self::ATTEMPTS; ++$i) {
       $response = @file_get_contents($this->__location, false, $context);
-      if ($response) {
+      if ($response && preg_match('/^\[-?\d+(,-?\d+)*\]$/', $response)) {
         break;
       } else {
         sleep(5);
@@ -441,8 +403,7 @@ class SolaX {
 
     $setData = json_decode($response, true);
     if ($setData) {
-      array_unshift($setData, 0); // indexovano od 1
-      unset($setData[0]);
+      array_unshift($setData, -1); // posun pole, aby bylo indexovano od 1
     } else {
       return [];
     }
@@ -478,7 +439,46 @@ class SolaX {
       }
       $result[$key] = $value;
     }
+
     return $result;
+  }
+
+  /**
+   * Vrati verze stridace
+   */
+  public function readVersion() {
+    $context = stream_context_create([
+      'http' => [
+        'method'  => 'POST',
+        'header'  => 'Content-Type: application/json',
+        'content' => "optType=ReadRealTimeData&pwd={$this->__dongleID}"
+      ]
+    ]);
+
+    $response = false;
+    for ($i = 0; $i < self::ATTEMPTS; ++$i) {
+      $response = @file_get_contents($this->__location, false, $context);
+      if ($response && false !== strpos($response, '"sn":') && false !== strpos($response, '"ver":')) {
+        break;
+      } else {
+        sleep(5);
+      }
+    }
+
+    $realData = json_decode($response, true);
+    if (!is_array($realData) || !array_key_exists('sn', $realData) ||
+        !array_key_exists('ver', $realData) || !is_array($realData['Information'])) {
+      return [];
+    }
+
+    $inverter = $this->__getInverter($realData['type']);
+    return array_merge(
+      $inverter->parseVersion($realData['Information']),
+      [
+        'RegistrationNumber' => $realData['sn'],
+        'FirmwareVersion'    => $realData['ver']
+      ]
+    );
   }
 
   /**

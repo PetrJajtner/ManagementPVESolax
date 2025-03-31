@@ -41,6 +41,11 @@ export const API_CONNECTION = 'connection';
 export const API_LIVE_DATA = 'live-data';
 
 /**
+ * URL logu
+ */
+export const API_OUTPUT = 'output';
+
+/**
  * URL cen OTE na dalsi den
  */
 export const API_PREDICTION = 'prediction';
