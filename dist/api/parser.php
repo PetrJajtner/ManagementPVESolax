@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/constants.php';
+require_once __DIR__.'/constants.php';
 
 /**
  * Dnesni den
@@ -20,7 +20,12 @@ class PricesParser {
   /**
    * Zastupny text pro datum
    */
-  private const PLACEHOLDER = '%date%';
+  private const DATE = '%date%';
+
+  /**
+   * Zastupny text pro interval
+   */
+  private const INTERVAL = '%interval%';
 
   /**
    * URL dat pro kurz men
@@ -39,13 +44,30 @@ class PricesParser {
 
   /**
    * URL dat cen OTE
+   * report_date=[date]&time_resolution=[PT60M|PT15M]
    */
-  private $__graphDataURL = 'https://www.ote-cr.cz/cs/kratkodobe-trhy/elektrina/denni-trh/@@chart-data?report_date=%date%';
+  private $__graphDataURL = 'https://www.ote-cr.cz/cs/kratkodobe-trhy/elektrina/denni-trh/@@chart-data?report_date=%date%&time_resolution=%interval%';
 
   /**
-   * Cenovy prah
+   * Casove rozliseni
    */
-  private $__threshold = 1000;
+  private $__granularities = [
+    '60m',
+    '15m'
+  ];
+
+  /**
+   * Parametr intervalu prubehoveho mereni
+   */
+  private $__intervals = [
+    'PT60M',
+    'PT15M'
+  ];
+
+  /**
+   * Index prubehoveno mereni
+   */
+  private $__metering = 0;
 
   /**
    * Priznak ukladani do souboru
@@ -56,6 +78,9 @@ class PricesParser {
    * Konstruktor
    */
   public function __construct() {
+    $settings = readJSON(FILE_SETTINGS);
+    $this->__metering = isset($settings['MeteringInterval']) ? +$settings['MeteringInterval'] : 0;
+
     if (isset($_REQUEST['json'])) {
       $this->__toFile = false;
     }
@@ -66,19 +91,22 @@ class PricesParser {
     if (isset($_REQUEST['1'])) {
       $this->__date = date('Y-m-d', strtotime('+1 day'));
     }
-    $this->__graphDataURL = str_replace(self::PLACEHOLDER, $this->__date, $this->__graphDataURL);
+    $this->__graphDataURL = str_replace([self::DATE, self::INTERVAL], [$this->__date, $this->__intervals[$this->__metering]], $this->__graphDataURL);
 
-    $currencyDate = $this->__date < TODAY ? 'den[' . date('Ymd', strtotime($this->__date)) . ']' : '';
-    $this->__currencyDataURL = str_replace(self::PLACEHOLDER, $currencyDate, $this->__currencyDataURL);
+    $currencyDate = $this->__date < TODAY ? 'den['.date('Ymd', strtotime($this->__date)).']' : '';
+    $this->__currencyDataURL = str_replace(self::DATE, $currencyDate, $this->__currencyDataURL);
   }
 
   /**
    * Hlavni behova metoda
    */
   public function run() {
-    $this->__loadSettings();
-    $this->__parseCurrency();
-    $this->__parseGraphData();
+    if (null === $this->__parseCurrency()) {
+      return;
+    }
+    if (null === $this->__parseGraphData()) {
+      return;
+    }
   }
 
   /**
@@ -100,16 +128,22 @@ class PricesParser {
    * Vrati obsah souboru
    */
   private function __getContents($url) {
-    $data = @file_get_contents($url);
+    $context = stream_context_create([
+      'ssl' => [
+        'verify_peer'      => false,
+        'verify_peer_name' => false
+      ]
+    ]);
+
+    $data = @file_get_contents($url, false, $context);
     if (false === $data) {
-      $this->__output(array('error' => "No data for {$url}"));
-      exit;
+      $this->__output(['error' => "No data for {$url}"]);
+      return null;
     }
 
     $decoded = json_decode($data, true);
     if (null === $decoded) {
-      $this->__output(array('error' => "Decoding data failed for {$url}"));
-      exit;
+      $this->__output(['error' => "Decoding data failed for {$url}"]);
     }
 
     return $decoded;
@@ -125,36 +159,20 @@ class PricesParser {
   }
 
   /**
-   * Nacte nastaveni
-   */
-  private function __loadSettings() {
-    $data = $this->__getContents(FILE_SETTINGS);
-    $threshold =  $data['Threshold'];
-    if (!isset($threshold)) {
-      $this->__output(array('error' => 'Unable to load threshold from settings.'));
-      exit;
-    }
-
-    $this->__threshold = $threshold;
-  }
-
-  /**
    * Vypise data a ukonci beh
    */
   private function __output(array $data) {
     $output = ['Date' => $this->__date];
     if (array_key_exists('data', $data) && $data['data']) {
       $output['Average'] = $this->__priceAverage($data['data']);
-      $output['Threshold'] = $this->__threshold;
       $output['Data'] = $data['data'];
     }
     if (array_key_exists('error', $data) && $data['error']) {
       $output['Error'] = $data['error'];
     }
 
-    $json = toJSON($output);
     if ($this->__toFile) {
-      if (false !== file_put_contents($this->__date === date('Y-m-d') ? FILE_PRICES : FILE_PREDICTION, $json, LOCK_EX)) {
+      if (false !== saveJSON($this->__date === date('Y-m-d') ? FILE_PRICES : FILE_PREDICTION, $output, LOCK_EX)) {
         http_response_code(200);
       } else {
         http_response_code(500);
@@ -162,8 +180,7 @@ class PricesParser {
       exit;
     }
 
-    header('Content-type: application/json; charset="UTF-8"');
-    echo $json;
+    echoJSON($output, false);
   }
 
   /**
@@ -171,15 +188,19 @@ class PricesParser {
    */
   private function __parseCurrency() {
     $data = $this->__getContents($this->__currencyDataURL);
+    if (null === $data) {
+      return null;
+    }
+
     $exchange = $data['kurzy'][self::CURRENCY]['dev_stred'];
     $unit = $data['kurzy'][self::CURRENCY]['jednotka'];
 
     if (!isset($exchange) || !isset($unit)) {
-      $this->__output(array('error' => 'Failed to read ' . self::CURRENCY . ' exchange rate? kurzy->' . self::CURRENCY . '->(dev_stred | jednotka)'));
-      exit;
+      $this->__output(['error' => 'Failed to read '.self::CURRENCY.' exchange rate? kurzy->'.self::CURRENCY.'->(dev_stred | jednotka)']);
+      return null;
     }
 
-    $this->__eurExchangeRate = $exchange / $unit;
+    return $this->__eurExchangeRate = $exchange / $unit;
   }
 
   /**
@@ -187,56 +208,70 @@ class PricesParser {
    */
   private function __parseGraphData() {
     $data = $this->__getContents($this->__graphDataURL);
-    $dataLines = $data['data']['dataLine'];
+    if (null === $data) {
+      return null;
+    }
 
+    $dataLines = $data['data']['dataLine'];
     if (!isset($dataLines)) {
-      $this->__output(array('error' => 'Failed to read OTE market indices - possible missing keys? data->dataLine'));
-      exit;
+      $this->__output(['error' => 'Failed to read OTE market indices - possible missing keys? data->dataLine']);
+      return null;
     }
     if (!count($dataLines)) {
-      $this->__output(array('error' => 'Unable to read data lines - possible empty? data->dataLine'));
-      exit;
+      $this->__output(['error' => 'Unable to read data lines - possible empty? data->dataLine']);
+      return null;
     }
 
-    $pricesDataLines = array_filter($dataLines, function ($dl) {
-      return '1' === $dl['type'] || (false !== stripos($dl['title'], self::CURRENCY));
+    $granularity = $this->__granularities[$this->__metering];
+    $pricesDataLines = array_filter($dataLines, function ($dl) use ($granularity) {
+      return '1' === $dl['type'] && false !== stripos($dl['title'], self::CURRENCY) && false !== stripos($dl['title'], $granularity);
     });
 
     $linesCount = count($pricesDataLines);
-    if (1 !== $linesCount) { // 1 => jedna datova rada ceny za MWh
-      $this->__output(array('error' => 'Zero or more than one data lines found. data->dataLine'));
-      exit;
+    if (1 !== $linesCount) { // 1 => jedna datova rada ceny za MWh (po 15 nebo 60 min.)
+      $this->__output(['error' => 'Zero or more than one data lines found. data->dataLine']);
+      return null;
     }
 
     $points = array_values($pricesDataLines)[0]['point'];
     if (!isset($points)) {
-      $this->__output(array('error' => 'Unable to read data points - possible missing keys? data->dataLine ... point'));
-      exit;
+      $this->__output(['error' => 'Unable to read data points - possible missing keys? data->dataLine ... point']);
+      return null;
     }
     if (!count($points)) {
-      $this->__output(array('error' => 'Unable to read data points - possible empty? data->dataLine ... point'));
-      exit;
+      $this->__output(['error' => 'Unable to read data points - possible empty? data->dataLine ... point']);
+      return null;
     }
-
 
     $offset = $this->__getDSTChange();
     $rate = $this->__eurExchangeRate;
-    $threshold = $this->__threshold;
-    $priceDataLine = array_map(function ($pt) use ($offset, $rate, $threshold) {
-      $hour = $pt['x'] - 1;
+    $metering = $this->__metering;
+    $priceDataLine = array_map(function ($pt) use ($offset, $rate, $metering) {
+      $timePoint = +$pt['x'] - 1;
+      $hour = 0;
+      $minute = 0;
+
+      if (1 === $metering) { // 15 min.
+        $hour = intval($timePoint / 4);
+        $minute = 15 * ($timePoint % 4);
+      } else { // 60 min.
+        $hour = intval($timePoint);
+      }
       if ((0 < $offset && 1 < $hour) || (0 > $offset && 2 < $hour)) {
         $hour += $offset;
       }
+
+      $time = sprintf("%02d:%02d", $hour, $minute);
       $price = round($pt['y'] * $rate, DECIMAL_PLACES);
 
-      return array(
-        'Allow' => $price > $threshold,
-        'Hour'  => $hour,
+      return [
+        'Time'  => $time,
         'Price' => $price
-      );
+      ];
     }, $points);
 
-    $this->__output(array('data' => $priceDataLine));
+    $this->__output(['data' => $priceDataLine]);
+    return true;
   }
 
 }

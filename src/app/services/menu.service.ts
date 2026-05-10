@@ -1,8 +1,8 @@
 import { Location } from '@angular/common';
 import { Injectable, Signal, computed, effect, inject } from '@angular/core';
 import { Router, Routes } from '@angular/router';
-import { MAIN_MENU_ROUTES, SUB_MENU_ROUTES } from '@app/app-routing.module';
-import { ROUTE_PATH_INDEX } from '@app/models/paths.model';
+import { MAIN_MENU_ROUTES, SUB_MENU_ROUTES } from '@app/app.routes';
+import { ROUTE_PATH_INDEX } from '@libs/shared';
 
 /**
  * Nabidka
@@ -24,12 +24,12 @@ export class MenuService {
   /**
    * Sluzba pro interakci s adresou URL prohlizece
    */
-  private __location: Location = inject(Location);
+  private __location: Location = inject<Location>(Location);
 
   /**
    * Smerovac
    */
-  private __router: Router = inject(Router);
+  private __router: Router = inject<Router>(Router);
 
   /**
    * Posledni znama cesta
@@ -39,7 +39,7 @@ export class MenuService {
   /**
    * Signal finalni nabidky
    */
-  private __menuSg: Signal<Menu> = computed(() => {
+  private __menuSg: Signal<Menu> = computed<Menu>(() => {
     const menu: Menu = {
       main: this.__filterRoutes(MAIN_MENU_ROUTES),
       path: this.__lastPath

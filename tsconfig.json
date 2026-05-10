@@ -8,42 +8,43 @@
   },
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "declaration": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "lib": [
-      "dom",
-      "ES2022"
-    ],
     "module": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "./dist/out-tsc",
     "paths": {
       "@app/*": [
-        "src/app/*"
+        "./src/app/*"
       ],
-      "@help/*": [
-        "src/app/modules/help/*"
+      "@libs/help": [
+        "./src/libs/help/index.ts"
       ],
-      "@index/*": [
-        "src/app/modules/index/*"
+      "@libs/index": [
+        "./src/libs/index/index.ts"
       ],
-      "@settings/*": [
-        "src/app/modules/settings/*"
+      "@libs/pve": [
+        "./src/libs/pve/index.ts"
       ],
-      "@shared/*": [
-        "src/app/modules/shared/*"
+      "@libs/settings": [
+        "./src/libs/settings/index.ts"
+      ],
+      "@libs/shared": [
+        "./src/libs/shared/index.ts"
       ]
     },
+    "rootDir": "./src",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
+    "strictPropertyInitialization": true,
     "target": "ES2022",
     "useDefineForClassFields": false
   }

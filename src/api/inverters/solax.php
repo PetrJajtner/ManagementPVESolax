@@ -3,7 +3,7 @@
 /**
  * Tridy pro zpracovani dat ze stridacu Solax
  *
- * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
+ * @author     Ing. Petr Jajtner <petr@jajtnerovi.cz>
  * @copyright  Ing. Petr Jajtner 2024 - nyni
  */
 require_once dirname(__DIR__).'/constants.php';
@@ -191,21 +191,30 @@ class SolaX {
   /**
    * Pocet pokusu o pripojeni na SolaX
    */
-  private const ATTEMPTS = 3;
+  private const ATTEMPTS = 10;
 
   /**
-   * Registry stridace
+   * Registry stridace - indexy posunuty o jeden tak, by zacinaly jednickou
    */
   private const REGISTRY = [
-                         // [index (!od jedne), prihlaseni?, jednotka, nasobek, prevod]
-    'WorkingMode'        => [ 28, false, 'NONE',    1],                 // Pracovni rezim
-    'WorkingModeText'    => [ 28, false, 'NONE',    1, '_workingMode'], // Pracovni rezim textove
-    'SelfUseMinSoC'      => [ 29, true,  'PERCENT', 1],                 // Min. SOC v rezimu vlastni spotreby
-    'ManualModeCharging' => [ 36, false, 'NONE',    1],                 // Nucene nabijeni/vybijeni v manualnim rezimu
-    'ExportControl'      => [ 48, true,  'W',      10],                 // Rizeni exportu
-    'BiasMode'           => [190, true,  'NONE',    1],                 // Ovlivneni pretoku
-    'BiasModeText'       => [190, true,  'NONE',    1, '_biasMode'],    // Ovlivneni pretoku textove
-    'BiasPower'          => [250, true,  'W',       1],                 // Vykon ovlivnenych pretoku
+                         // [index(y) (!od jedne), prihlaseni?, jednotka, nasobek, prevod]
+    'DateTime'           => [[25, 26, 27], true,  null,   null, '_getDateTime'], // Datum a cas stridace
+    'WorkingMode'        => [          28, false, 'NONE',    1],                 // Pracovni rezim
+    'WorkingModeText'    => [          28, false, 'NONE',    1, '_workingMode'], // Pracovni rezim textove
+    'SelfUseMinSoC'      => [          29, true,  'PERCENT', 1],                 // Min. SOC v rezimu vlastni spotreby
+    'ManualModeCharging' => [          36, false, 'NONE',    1],                 // Nucene nabijeni/vybijeni v manualnim rezimu
+    'ExportControl'      => [          48, true,  'W',      10],                 // Rizeni exportu
+    'BiasMode'           => [         190, true,  'NONE',    1],                 // Ovlivneni pretoku
+    'BiasModeText'       => [         190, true,  'NONE',    1, '_biasMode'],    // Ovlivneni pretoku textove
+    'BiasPower'          => [         250, true,  'W',       1],                 // Vykon udrzovaciho pretoku
+  ];
+
+  /**
+   * Nastavovaci klice registru
+   */
+  private const REGISTRY_SET = [
+               // [optType,  [parametry => callback]]
+    'DateTime' => ['setRTC', ['YMDHMS' => '_setDateTime']]
   ];
 
   /**
@@ -313,11 +322,11 @@ class SolaX {
   public function getRealValue($key, $unit = true, $force = false) {
     $cacheKey = json_encode(['method' => __METHOD__, 'unit' => $unit]);
     if (!$force && array_key_exists($cacheKey, $this->__cache)) {
-      return $this->__cache[$cacheKey][$key];
+      return $this->__cache[$cacheKey][$key] ?? null;
     }
 
     $this->__cache[$cacheKey] = $this->readRealData(null, $unit);
-    return $this->__cache[$cacheKey][$key];
+    return $this->__cache[$cacheKey][$key] ?? null;
   }
 
   /**
@@ -330,12 +339,12 @@ class SolaX {
    */
   public function getRegistryValue($key, $unit = true, $force = false) {
     $cacheKey = json_encode(['method' => __METHOD__, 'unit' => $unit]);
-    if (!$force && array_key_exists($cacheKey, $this->__cache)) {
+    if (!$force && array_key_exists($cacheKey, $this->__cache) && array_key_exists($key, $this->__cache[$cacheKey])) {
       return $this->__cache[$cacheKey][$key];
     }
 
     $this->__cache[$cacheKey] = $this->readSetData(null, $unit);
-    return $this->__cache[$cacheKey][$key];
+    return $this->__cache[$cacheKey][$key] ?? null;
   }
 
   /**
@@ -420,17 +429,17 @@ class SolaX {
 
       $registry = self::REGISTRY[$key];
 
-      $value = $setData[$registry[0]];
+      $value = is_array($registry[0]) ? array_map(function($index) use ($setData) { return $setData[$index]; }, $registry[0]) : $setData[$registry[0]]; // Index 0 => registracni index
       if (!isset($value)) {
         $value = null;
       }
-      if (isset($registry[3]) && is_numeric($value)) {
+      if (isset($registry[3]) && is_numeric($value)) { // Index 3 => nasobek
         $value *= $registry[3];
       }
-      if (isset($registry[4])) {
+      if (isset($registry[4])) { // Index 4 => konverzni funkce
         $value = $this->{$registry[4]}($value);
       }
-      if ($unit && isset($registry[2]) && array_key_exists($registry[2], self::UNITS)) {
+      if ($unit && isset($registry[2]) && array_key_exists($registry[2], self::UNITS)) { // Index 2 => jednotka
         $value .= self::UNITS[$registry[2]];
       }
       if (null === $unit) {
@@ -485,16 +494,17 @@ class SolaX {
    * Nastavi hodnotu registru
    */
   public function setRegistryValue($registryKey, $value) {
-    if (isset(self::REGISTRY[$registryKey]) && self::REGISTRY[$registryKey][1]) {
-      $this->setRegistryValue(0, '2014'); // „Prihlaseni“
+    if (isset(self::REGISTRY[$registryKey]) && self::REGISTRY[$registryKey][1]) { // Index 1 => vyzadovano "prihlaseni"
+      $this->setRegistryValue(0, '2014');
     }
 
     $converted = $value;
-    if (isset(self::REGISTRY[$registryKey][3]) && is_numeric($value)) {
+    if (isset(self::REGISTRY[$registryKey][3]) && is_numeric($value)) { // Index 3 => delitel
       $multiplier = self::REGISTRY[$registryKey][3] ? 1 / self::REGISTRY[$registryKey][3] : 1;
       $converted *= $multiplier;
     }
 
+    $optType = 'setReg';
     $data = json_encode([
       'num' => 1,
       'Data' => [[
@@ -502,11 +512,24 @@ class SolaX {
         'val' => "{$converted}"
       ]]
     ]);
+
+    if (isset(self::REGISTRY_SET[$registryKey]) && is_array(self::REGISTRY_SET[$registryKey])) {
+      $result = [];
+      if (isset(self::REGISTRY_SET[$registryKey][1]) && is_array(self::REGISTRY_SET[$registryKey][1])) {
+        foreach (self::REGISTRY_SET[$registryKey][1] as $param => $clb) { // Index 1 => parametry a modifikatory
+          $result[$param] = $this->{$clb}($value);
+        }
+      }
+
+      $optType = self::REGISTRY_SET[$registryKey][0]; // Index 0 => optType
+      $data = json_encode($result);
+    }
+
     $context = stream_context_create([
       'http' => [
         'method'  => 'POST',
         'header'  => 'Content-Type: application/json',
-        'content' => "optType=setReg&pwd={$this->__dongleID}&data={$data}"
+        'content' => "optType={$optType}&pwd={$this->__dongleID}&data={$data}"
       ]
     ]);
 
@@ -539,6 +562,25 @@ class SolaX {
   }
 
   /**
+   * Vrati datum a cas RTC stridace ve formatu JSON
+   */
+  protected function _getDateTime($value) {
+    if (!is_array($value) || 3 !== count($value)) {
+      return null;
+    }
+
+    [$minsec, $dayhour, $yearmonth] = $value; // povinne poradi od nejnizsiho indexu
+    $second = low8bits($minsec);
+    $minute = high8bits($minsec);
+    $hour = low8bits($dayhour);
+    $day = high8bits($dayhour);
+    $month = low8bits($yearmonth);
+    $year = 2000 + high8bits($yearmonth);
+
+    return date('c', mktime($hour, $minute, $second, $month, $day, $year));
+  }
+
+  /**
    * Vrati textovy popis manualniho rezimu
    *
    * @param int $value
@@ -548,6 +590,27 @@ class SolaX {
     return array_key_exists($value, self::MANUAL_MODES)
             ? self::MANUAL_MODES[$value]
             : 'ManualModeUnknown';
+  }
+
+  /**
+   * Prevede datum ve formatu ISO 8601 na parametr URL
+   */
+  protected function _setDateTime($value) {
+    $dt = new DateTime($value, new DateTimeZone(TIMEZONE));
+    if ('now' === $value) {
+      $secs = 59 - +$dt->format('s');
+      (1 < $secs) && sleep($secs - 1);
+      $dt->modify('+'.($secs + 2).' seconds');
+    }
+
+    return [
+      +$dt->format('Y') - 2000,
+      +$dt->format('m'),
+      +$dt->format('d'),
+      +$dt->format('H'),
+      +$dt->format('i')
+      // Sekundy se do stridace nepropisuji, berou se jako "00"
+    ];
   }
 
   /**

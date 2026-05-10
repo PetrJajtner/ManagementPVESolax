@@ -1,29 +1,38 @@
-// @ts-check
+import angular from '@angular-eslint/eslint-plugin';
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import angular from 'angular-eslint';
 import stylistic from '@stylistic/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import angularEslint from 'angular-eslint';
+import { defineConfig } from 'eslint/config';
+import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default defineConfig([
   {
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.stylistic,
-      ...angular.configs.tsRecommended,
-      stylistic.configs['recommended-flat']
-    ],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.angular/**',
+      '**/out-tsc/**',
+      'eslint.config.js'
+    ]
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...tseslint.configs.stylistic,
+  ...angularEslint.configs.tsRecommended,
+  {
     files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: 'tsconfig.json',
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
         type: 'module'
       }
     },
-    processor: angular.processInlineTemplates,
+    processor: angularEslint.processInlineTemplates,
     plugins: {
+      '@angular-eslint': angular,
       '@stylistic': stylistic
     },
     rules: {
@@ -34,7 +43,7 @@ export default tseslint.config(
           prefix: '',
           style:  'kebab-case',
           type:   'element'
-        },
+        }
       ],
       '@angular-eslint/contextual-lifecycle': 'error',
       '@angular-eslint/directive-class-suffix': 'error',
@@ -46,7 +55,7 @@ export default tseslint.config(
           type:   'attribute'
         }
       ],
-      '@angular-eslint/no-conflicting-lifecycle': 'error',
+      // '@angular-eslint/no-conflicting-lifecycle': 'error',
       '@angular-eslint/no-duplicates-in-metadata-arrays': 'error',
       '@angular-eslint/no-input-rename': 'off',
       '@angular-eslint/no-inputs-metadata-property': 'error',
@@ -101,24 +110,18 @@ export default tseslint.config(
         'warn',
         {
           selector: [
-            'objectLiteralProperty',
-            'typeProperty'
-          ],
-          format: [
-            'snake_case',
-            'camelCase',
-            'PascalCase'
-          ],
-          leadingUnderscore: 'allow'
-        },
-        {
-          selector: [
-            'parameter',
             'classProperty',
             'method'
           ],
           format: [
-            'camelCase'
+            'PascalCase'
+          ],
+          modifiers: [
+            'private',
+            'static'
+          ],
+          prefix: [
+            '__'
           ]
         },
         {
@@ -170,22 +173,6 @@ export default tseslint.config(
           ]
         },
         {
-          selector: [
-            'property',
-            'method'
-          ],
-          format: [
-            'PascalCase'
-          ],
-          modifiers: [
-            'private',
-            'static'
-          ],
-          prefix: [
-            '__'
-          ]
-        },
-        {
           selector: 'method',
           format: [
             'PascalCase'
@@ -195,6 +182,28 @@ export default tseslint.config(
           ]
         },
         {
+          selector: [
+            'parameter',
+            'classProperty',
+            'method'
+          ],
+          format: [
+            'camelCase'
+          ]
+        },
+        {
+          selector: [
+            'objectLiteralProperty',
+            'typeProperty'
+          ],
+          format: [
+            'snake_case',
+            'camelCase',
+            'PascalCase'
+          ],
+          leadingUnderscore: 'allow'
+        },
+        {
           selector: 'enumMember',
           format: [
             'PascalCase'
@@ -202,7 +211,6 @@ export default tseslint.config(
         }
       ],
       '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-empty-interface': 'warn',
       '@typescript-eslint/no-empty-object-type': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
@@ -217,6 +225,7 @@ export default tseslint.config(
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-require-imports': 'warn',
       '@typescript-eslint/no-shadow': [
         'off',
         {
@@ -231,7 +240,6 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-var-requires': 'warn',
       '@typescript-eslint/no-wrapper-object-types': 'error',
       '@typescript-eslint/parameter-properties': 'off',
       '@typescript-eslint/prefer-for-of': 'error',
@@ -248,6 +256,10 @@ export default tseslint.config(
       ],
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/unified-signatures': 'off',
+      '@stylistic/arrow-parens': [
+        'error',
+        'always'
+      ],
       '@stylistic/block-spacing': 'off',
       '@stylistic/brace-style': [
         'error',
@@ -256,6 +268,14 @@ export default tseslint.config(
       '@stylistic/comma-dangle': [
         'error',
         'never'
+      ],
+      '@stylistic/eol-last': 'error',
+      '@stylistic/generator-star-spacing': [
+        'warn',
+        {
+          after: false,
+          before: true
+        }
       ],
       '@stylistic/indent': [
         'warn',
@@ -305,6 +325,10 @@ export default tseslint.config(
           }
         }
       ],
+      '@stylistic/new-parens': 'error',
+      '@stylistic/no-multi-spaces': 'off',
+      '@stylistic/no-multiple-empty-lines': 'warn',
+      '@stylistic/no-trailing-spaces': 'warn',
       '@stylistic/object-curly-spacing': 'off',
       '@stylistic/operator-linebreak': [
         'error',
@@ -322,25 +346,48 @@ export default tseslint.config(
           classes: 'always'
         }
       ],
-      '@stylistic/no-multi-spaces': 'off',
+      '@stylistic/quote-props': [
+        'error',
+        'as-needed'
+      ],
+      '@stylistic/quotes': [
+        'error',
+        'single',
+        {
+          avoidEscape: true,
+          allowTemplateLiterals: 'always'
+        }
+      ],
       '@stylistic/semi': [
         'error',
         'always'
+      ],
+      '@stylistic/space-before-function-paren': [
+        'error',
+        {
+          anonymous: 'never',
+          asyncArrow: 'always',
+          named: 'never'
+        }
+      ],
+      '@stylistic/spaced-comment': [
+        'warn',
+        'always',
+        {
+          markers: [
+            '/'
+          ]
+        }
       ],
       '@stylistic/type-annotation-spacing': 'error',
       'arrow-body-style': [
         'off',
         'as-needed'
       ],
-      'arrow-parens': [
-        'error',
-        'always'
-      ],
       'complexity': 'off',
       'constructor-super': 'error',
       'curly': 'error',
       'dot-notation': 'off',
-      'eol-last': 'error',
       'eqeqeq': [
         'error',
         'smart'
@@ -360,7 +407,6 @@ export default tseslint.config(
       ],
       'id-match': 'error',
       'max-classes-per-file': 'off',
-      'new-parens': 'error',
       'no-bitwise': 'off',
       'no-caller': 'error',
       'no-cond-assign': 'error',
@@ -404,11 +450,9 @@ export default tseslint.config(
       'no-eval': 'error',
       'no-fallthrough': 'error',
       'no-invalid-this': 'warn',
-      'no-multiple-empty-lines': 'warn',
       'no-new-wrappers': 'error',
       'no-restricted-imports': 'error',
       'no-shadow': 'off',
-      'no-trailing-spaces': 'warn',
       'no-throw-literal': 'error',
       'no-undef-init': 'error',
       'no-underscore-dangle': 'off',
@@ -423,38 +467,9 @@ export default tseslint.config(
         'never'
       ],
       'prefer-const': 'error',
-      'quotes': [
-        'error',
-        'single',
-        {
-          avoidEscape: true,
-          allowTemplateLiterals: true
-        }
-      ],
-      'quote-props': [
-        'error',
-        'as-needed'
-      ],
       'no-case-declarations': 'warn',
       'prefer-arrow-callback': 'warn',
       'radix': 'error',
-      'space-before-function-paren': [
-        'error',
-        {
-          anonymous: 'never',
-          asyncArrow: 'always',
-          named: 'never'
-        }
-      ],
-      'spaced-comment': [
-        'warn',
-        'always',
-        {
-          markers: [
-            '/'
-          ]
-        }
-      ],
       'sort-imports': [
         'warn',
         {
@@ -473,16 +488,15 @@ export default tseslint.config(
       'valid-typeof': 'off'
     }
   },
+  ...angularEslint.configs.templateRecommended.map((config) => ({...config, files: ['src/**/*.html']})),
+  ...angularEslint.configs.templateAccessibility.map((config) => ({...config, files: ['src/**/*.html']})),
   {
     files: ['src/**/*.html'],
-    extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
-    ],
     rules: {
+      '@angular-eslint/template/elements-content': 'error',
       '@angular-eslint/template/no-autofocus': 'warn',
       '@angular-eslint/template/prefer-control-flow': 'error',
       '@angular-eslint/template/prefer-self-closing-tags': 'error'
     }
   }
-);
+]);

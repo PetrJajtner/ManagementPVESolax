@@ -1,0 +1,13 @@
+<span class="bit-mask">
+  @for (ctrlPair of formGroup.controls|keyvalue:() => 0; track ctrlPair.key; let last = $last) {
+    <label>
+      <input (change)="onChangeBit()"
+             [formControl]="ctrlPair.value"
+             type="checkbox" />
+      {{ctrlPair.key|translate}}
+    </label>
+    @if (!last) {
+      <br />
+    }
+  }
+</span>

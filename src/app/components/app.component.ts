@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy, Component, ElementRef, HostBinding, Signal, computed,
   effect, inject, isDevMode, signal
@@ -5,15 +6,13 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute, NavigationCancel, NavigationEnd, NavigationError,
-  NavigationStart, Router, Event as RouterEvent
+  NavigationStart, Router, Event as RouterEvent, RouterLink, RouterOutlet
 } from '@angular/router';
 import { APPLICATION_NAME } from '@app/app.settings';
-import { API } from '@app/models/urls.model';
-import { isObject } from '@app/models/utils.model';
-import { ConfigService, Theme } from '@app/services/config.service';
-import { I18nService } from '@app/services/i18n.service';
 import { Menu, MenuService } from '@app/services/menu.service';
-import { WaitService } from '@app/services/wait.service';
+import {
+  ConfigService, I18nService, Theme, TranslatePipe, WaitService, isObject
+} from '@libs/shared';
 
 /**
  * CSS trida pro nacitani
@@ -33,8 +32,13 @@ type PageTitle = {
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports:         [
+    NgClass,
+    RouterLink,
+    RouterOutlet,
+    TranslatePipe
+  ],
   selector:        'body',
-  standalone:      false,
   templateUrl:     './app.component.html'
 })
 export class AppComponent {
@@ -42,32 +46,32 @@ export class AppComponent {
   /**
    * Aktualni smerovani
    */
-  private __activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  private __activatedRoute: ActivatedRoute = inject<ActivatedRoute>(ActivatedRoute);
 
   /**
    * Smerovac
    */
-  private __router: Router = inject(Router);
+  private __router: Router = inject<Router>(Router);
 
   /**
    * Sluzba pro nacteni konfigurace aplikace
    */
-  private __configSrv: ConfigService = inject(ConfigService);
+  private __configSrv: ConfigService = inject<ConfigService>(ConfigService);
 
   /**
    * Sluzba zajistujici lokalizaci aplikace
    */
-  private __i18nSrv: I18nService = inject(I18nService);
+  private __i18nSrv: I18nService = inject<I18nService>(I18nService);
 
   /**
    * Sluzba pro vytvoreni (prip. pro prizpusobeni) nabidky
    */
-  private __menuSrv: MenuService = inject(MenuService);
+  private __menuSrv: MenuService = inject<MenuService>(MenuService);
 
   /**
    * Sluzba pro vyckavani
    */
-  private __waitSrv: WaitService = inject(WaitService);
+  private __waitSrv: WaitService = inject<WaitService>(WaitService);
 
   /**
    * Element tela
@@ -85,7 +89,7 @@ export class AppComponent {
   /**
    * Signal titulku stranky
    */
-  private __pageTitleSg: Signal<PageTitle | undefined> = computed(() => {
+  private __pageTitleSg: Signal<PageTitle | undefined> = computed<PageTitle | undefined>(() => {
     this.__navigationEndSg();
     return this.__getPageTitle();
   });
@@ -93,7 +97,7 @@ export class AppComponent {
   /**
    * Signal aktualni cesty
    */
-  private __pathSg: Signal<string | undefined> = computed(() => {
+  private __pathSg: Signal<string | undefined> = computed<string | undefined>(() => {
     const
       url = this.__navigationEndSg()?.url ?? this.__router.url,
       parts = `${url ? url : ''}`.replace(/^\//, '').split(/\/|\?/)
@@ -109,12 +113,12 @@ export class AppComponent {
   /**
    * Signal udalosti smerovace
    */
-  private __routerEventSg: Signal<RouterEvent | undefined> = toSignal(this.__router.events);
+  private __routerEventSg: Signal<RouterEvent | undefined> = toSignal<RouterEvent>(this.__router.events);
 
   /**
    * Signal pro nastaveni titulku stranky
    */
-  private __titleSg: Signal<string | undefined> = computed(() => {
+  private __titleSg: Signal<string | undefined> = computed<string | undefined>(() => {
     const
       pageTitle = this.__pageTitleSg(),
       language = this.__i18nSrv.languageSg()
@@ -173,14 +177,6 @@ export class AppComponent {
       'color: #f00; font-family: sans-serif; font-size: 28px; font-weight: bold;',
       'color: #666; font-family: sans-serif; font-size: 20px;'
     );
-
-    /**
-     * Nastavi cestu k data serveru
-     */
-    effect(() => {
-      const config = this.__configSrv.configSg();
-      config?.DataServerUrl && (API.Path = config.DataServerUrl);
-    });
 
     /**
      * Nastavi titulek

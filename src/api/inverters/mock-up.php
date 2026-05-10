@@ -3,7 +3,7 @@
 /**
  * Tridy maket (testovacích objektů) pro zpracovani dat ze stridacu Solax
  *
- * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
+ * @author     Ing. Petr Jajtner <petr@jajtnerovi.cz>
  * @copyright  Ing. Petr Jajtner 2024 - nyni
  */
 require_once dirname(__DIR__).'/constants.php';
@@ -539,8 +539,7 @@ class SolaX {
    * Vrati verze stridace
    */
   public function readVersion() {
-    $json = file_get_contents(__DIR__.'/mock-up.json');
-    $data = json_decode($json, true);
+    $data = readJSON(__DIR__.'/mock-up.json');
 
     $realData = $data['readRealData'];
     if (!is_array($realData) || !array_key_exists('sn', $realData) ||
@@ -638,7 +637,7 @@ class SolaX {
    */
   public function setRegistryValue($registryKey, $value) {
     if (isset(self::REGISTRY[$registryKey]) && self::REGISTRY[$registryKey][1]) {
-      $this->setRegistryValue(0, '2014'); // „Prihlaseni“
+      $this->setRegistryValue(0, '2014'); // "Prihlaseni"
     }
 
     $converted = $value;
@@ -660,7 +659,7 @@ class SolaX {
     unset($setData[0]);
 
     $data['readSetData'] = $setData;
-    $result = file_put_contents(__DIR__.'/mock-up.json', toJSON($data));
+    $result = saveJSON(__DIR__.'/mock-up.json', $data);
 
     return false !== $result;
   }

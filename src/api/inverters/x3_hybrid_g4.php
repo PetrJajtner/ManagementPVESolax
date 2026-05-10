@@ -3,7 +3,7 @@
 /**
  * Model stridace X3 Hybrid G4
  *
- * @author     Ing. Petr Jajtner <info@petrjajtner.cz>
+ * @author     Ing. Petr Jajtner <petr@jajtnerovi.cz>
  * @copyright  Ing. Petr Jajtner 2024 - nyni
  *
  * Pozn.: na zaklade https://github.com/squishykid/solax/blob/master/solax/inverters/x3_hybrid_g4.py
@@ -22,7 +22,7 @@ class X3HybridG4 extends SolaXInverter {
     0 => 'BatteryModeSelfUse',       // Rezim vlastni spotreby
     1 => 'BatteryModeForceTimeUse',  // Manualni rezim
     2 => 'BatteryModeBackUp',        // Rezim zalohy
-    3 => 'BatteryModeFeedinPriority' // Priorita dodavky do site'
+    3 => 'BatteryModeFeedinPriority' // Priorita dodavky do site
   ];
 
   /**

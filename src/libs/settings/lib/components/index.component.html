@@ -1,0 +1,902 @@
+<h1>{{'Settings'|translate}}</h1>
+<fieldset>
+  <legend>{{'SettingsApplication'|translate}}</legend>
+  @if (0 < appLanguages.length) {
+    @if (1 === appLanguages.length) {
+      <p>
+        <strong>{{'SettingsLanguage'|translate}}:</strong>
+        {{'Language'|translate:appLanguage}}
+      </p>
+    } @else {
+      <p>
+        <label for="language">{{'SettingsLanguage'|translate}}:</label>
+        <select [(ngModel)]="appLanguage"
+                id="language"
+                name="language">
+          @for (option of appLanguages; track $index) {
+            <option [attr.value]="option.value">{{'Language'|translate:option.label}}</option>
+          }
+        </select>
+      </p>
+    }
+  }
+  <p>
+    <label for="theme">{{'SettingsTheme'|translate}}:</label>
+    <select [(ngModel)]="appTheme"
+            id="theme"
+            name="theme">
+      @for (option of appThemes; track $index) {
+        <option [attr.value]="option.value">{{option.label|translate}}</option>
+      }
+    </select>
+  </p>
+</fieldset>
+
+@if (dataSg(); as data) {
+  <fieldset>
+    <legend>{{'SettingsInverter'|translate}}</legend>
+
+    @if (data.settingsData) {
+      <form (ngSubmit)="saveSettings()"
+            [autocomplete]="false"
+            [formGroup]="data.settingsForm"
+            action="#">
+        <fieldset>
+          <legend>{{'SettingsGeneral'|translate}}</legend>
+
+          <div class="settings-block">
+            @if (data.settingsForm.controls['System']; as system) {
+              @if (system.controls['Name']; as name) {
+                <p>
+                  <label for="Name">{{'SettingsSystemName'|translate}}:</label>
+                  <input [formControl]="name"
+                         id="Name"
+                         type="text" />
+                  @if (name.errors) {
+                    <span class="error">{{name.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (system.controls['Size']; as size) {
+                <p>
+                  <label for="Size">{{'SettingsSystemSize'|translate}}:</label>
+                  <input [formControl]="size"
+                         id="Size"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (size.errors) {
+                    <span class="error">{{size.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (system.controls['Date']; as date) {
+                <p>
+                  <label for="Date">{{'SettingsSystemDate'|translate}}:</label>
+                  <input [formControl]="date"
+                         id="Date"
+                         type="date" />
+                  @if (date.errors) {
+                    <span class="error">{{date.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+            }
+            @if (data.settingsForm.controls['SupplyPoint']; as supplyPoint) {
+              <p>
+                @if (supplyPoint.controls['PhasesCount']; as phasesCount) {
+                  <span>
+                    <label for="CircuitBreaker">{{'SettingsCircuitBreaker'|translate}}:</label>
+                    <input [formControl]="phasesCount"
+                           id="CircuitBreaker"
+                           type="number" />
+                    @if (phasesCount.errors) {
+                      <span class="error">{{phasesCount.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                ×
+                @if (supplyPoint.controls['CircuitBreakerValue']; as circuitBreakerValue) {
+                  <span>
+                    <label for="CircuitBreakerValue"> </label>
+                    <input [formControl]="circuitBreakerValue"
+                           id="CircuitBreakerValue"
+                           type="number" />
+                    @if (circuitBreakerValue.errors) {
+                      <span class="error">{{circuitBreakerValue.errors|errors:errorMap}}</span>
+                    }
+                    {{'SettingsUnitAmpere'|translate}}
+                  </span>
+                }
+              </p>
+              @if (supplyPoint.controls['NormalizedVoltage']; as normalizedVoltage) {
+                <p>
+                  <label for="NormalizedVoltage">{{'SettingsNormalizedVoltage'|translate}}:</label>
+                  <input [formControl]="normalizedVoltage"
+                         id="NormalizedVoltage"
+                         type="number" />
+                  @if (normalizedVoltage.errors) {
+                    <span class="error">{{normalizedVoltage.errors|errors:errorMap}}</span>
+                  }
+                  {{'SettingsUnitVolt'|translate}}
+                </p>
+              }
+            }
+            @if (data.settingsForm.controls['DongleID']; as dongleID) {
+              <p>
+                <label for="DongleID">{{'SettingsDongleID'|translate}}:</label>
+                <input [formControl]="dongleID"
+                       id="DongleID"
+                       type="text" />
+                @if (dongleID.errors) {
+                  <span class="error">{{dongleID.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+            @if (data.settingsForm.controls['Location']; as location) {
+              <p>
+                <label for="Location">{{'SettingsLocation'|translate}}:</label>
+                <input [formControl]="location"
+                       id="Location"
+                       type="text" />
+                @if (location.errors) {
+                  <span class="error">{{location.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+            @if (data.settingsForm.controls['DongleID'] && data.settingsForm.controls['Location']) {
+              <p>
+                <button (click)="testConnection(data.settingsForm)"
+                        [disabled]="!data.settingsForm.controls['DongleID'].valid || !data.settingsForm.controls['Location'].valid"
+                        class="secondary"
+                        type="button">
+                  {{'SettingsTestConnection'|translate}}
+                </button>
+              </p>
+            }
+            @if (data.settingsForm.controls['VerboseLevel']; as verboseLevel) {
+              <p>
+                <label for="VerboseLevel">{{'SettingsVerboseLevel'|translate}}:</label>
+                <bitmask [formControl]="verboseLevel"
+                         [options]="verboseLevels"
+                         id="VerboseLevel" />
+              </p>
+            }
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>{{'SettingsPrices'|translate}}</legend>
+
+          <div class="settings-block">
+            @if (data.settingsForm.controls['Threshold']; as threshold) {
+              <p>
+                <label for="Threshold">{{'SettingsThreshold'|translate}}:</label>
+                <input [formControl]="threshold"
+                       id="Threshold"
+                       type="number" />
+                {{'SettingsUnitCurrencyPerMWH'|translate}}
+                @if (threshold.errors) {
+                  <span class="error">{{threshold.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+            @if (data.settingsForm.controls['MeteringInterval']; as meteringInterval) {
+              <p>
+                <label for="MeteringInterval">{{'MeteringInterval'|translate}}:</label>
+                <select [formControl]="meteringInterval"
+                        id="MeteringInterval">
+                  @for (type of meteringIntervals; let index = $index; track index) {
+                    <option [attr.selected]="+meteringInterval.value === index ? 'selected' : undefined"
+                            [attr.value]="index">{{type|translate}}</option>
+                  }
+                </select>
+                @if (meteringInterval.errors) {
+                  <span class="error">{{meteringInterval.errors|errors:errorMap}}</span>
+                }
+              </p>
+            }
+          </div>
+        </fieldset>
+
+        @if (data.settingsForm.controls['Export']; as export) {
+          <fieldset>
+            <legend>
+              {{'SettingsExportControl'|translate}}
+              <span class="legend-small">{{'SettingsSpotControlled'|translate}}</span>
+            </legend>
+
+            <div class="settings-block">
+              @if (export.controls['Status']; as status) {
+                <p>
+                  <label for="Status">{{'SettingsStatus'|translate}}:</label>
+                  <input (input)="onExportControlChange($event, data.settingsForm.controls['SmartExport'].controls['Status'])"
+                         [formControl]="status"
+                         id="Status"
+                         type="checkbox" />
+                </p>
+              }
+              @if (export.controls['OnValue']; as onValue) {
+                <p>
+                  <label [attr.title]="'SettingsExportOnValueInfo'|translate"
+                         for="OnValue">{{'SettingsExportOnValue'|translate}}:</label>
+                  <input [attr.readonly]="export.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="onValue"
+                         id="OnValue"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (onValue.errors) {
+                    <span class="error">{{onValue.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['OffValue']; as offValue) {
+                <p>
+                  <label [attr.title]="'SettingsExportOffValueInfo'|translate"
+                        for="OffValue">{{'SettingsExportOffValue'|translate}}:</label>
+                  <input [attr.readonly]="export.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="offValue"
+                         id="OffValue"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (offValue.errors) {
+                    <span class="error">{{offValue.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['OffMode']; as offMode) {
+                <p>
+                  <label for="OffMode">{{'SettingsExportOffMode'|translate}}:</label>
+                  @if (export.controls['Status'].value) {
+                    <select [formControl]="offMode"
+                            id="OffMode">
+                      @for (mode of workingModes; let index = $index; track index) {
+                        <option [attr.selected]="+offMode.value === index ? 'selected' : undefined"
+                                [attr.value]="index">{{mode|translate}}</option>
+                      }
+                    </select>
+                  } @else {
+                    <input [attr.value]="workingModes[+offMode.value]|translate"
+                           class="input-text"
+                           id="OffMode"
+                           readonly
+                           type="text" />
+                  }
+                </p>
+              }
+              <hr />
+              @if (export.controls['NegativePriceHandling']; as negativePriceHandling) {
+                <p>
+                  <label [attr.title]="'SettingsExportNegativePriceHandlingInfo'|translate"
+                         for="NegativePriceHandling">{{'SettingsExportNegativePriceHandling'|translate}}:</label>
+                  @if (export.controls['Status'].value) {
+                    <input [formControl]="negativePriceHandling"
+                           id="NegativePriceHandling"
+                           type="checkbox" />
+                  } @else {
+                    <input [formControl]="negativePriceHandling"
+                           id="NegativePriceHandling"
+                           type="hidden" />
+                    <input [attr.checked]="negativePriceHandling.value ? 'checked' : undefined"
+                           disabled
+                           type="checkbox" />
+                  }
+                </p>
+              }
+              @if (export.controls['NegativePriceOffValue']; as negativePriceOffValue) {
+                <p>
+                  <label [attr.title]="'SettingsExportNegativePriceOffValueInfo'|translate"
+                         for="NegativePriceOffValue">{{'SettingsExportNegativePriceOffValue'|translate}}:</label>
+                  <input [attr.readonly]="!export.controls['Status'].value || !export.controls['NegativePriceHandling'].value ? 'readonly' : undefined"
+                         [formControl]="negativePriceOffValue"
+                         id="NegativePriceOffValue"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (negativePriceOffValue.errors) {
+                    <span class="error">{{negativePriceOffValue.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['NegativePriceBiasMode']; as negativePriceBiasMode) {
+                <p>
+                  <label [attr.title]="'SettingsExportNegativePriceBiasModeInfo'|translate"
+                         for="NegativePriceBiasMode">{{'BiasMode'|translate}}:</label>
+                  @if (export.controls['Status'].value && export.controls['NegativePriceHandling'].value) {
+                    <select [formControl]="negativePriceBiasMode"
+                            id="NegativePriceBiasMode">
+                      @for (mode of biasModes; let index = $index; track index) {
+                        <option [attr.selected]="+negativePriceBiasMode.value === index ? 'selected' : undefined"
+                                [attr.value]="index">{{mode|translate}}</option>
+                      }
+                    </select>
+                  } @else {
+                    <input [attr.value]="biasModes[+negativePriceBiasMode.value]|translate"
+                           class="input-text"
+                           id="NegativePriceBiasMode"
+                           readonly
+                           type="text" />
+                  }
+                  @if (negativePriceBiasMode.errors) {
+                    <span class="error">{{negativePriceBiasMode.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (0 < +export.controls['NegativePriceBiasMode'].value) {
+                @if (export.controls['NegativePriceBiasPower']; as negativePriceBiasPower) {
+                  <p>
+                    <label [attr.title]="'SettingsExportNegativePriceBiasPowerInfo'|translate"
+                           for="NegativePriceBiasPower">{{'SettingsExportNegativePriceBiasPower'|translate}}:</label>
+                    <input [attr.readonly]="!export.controls['Status'].value || !export.controls['NegativePriceHandling'].value ? 'readonly' : undefined"
+                           [formControl]="negativePriceBiasPower"
+                           id="NegativePriceBiasPower"
+                           type="number" />
+                    {{'SettingsUnitWatt'|translate}}
+                    @if (negativePriceBiasPower.errors) {
+                      <span class="error">{{negativePriceBiasPower.errors|errors:errorMap}}</span>
+                    }
+                  </p>
+                }
+              }
+              <hr />
+              @if (export.controls['ProfitPriceHandling']; as profitPriceHandling) {
+                <p>
+                  <label [attr.title]="'SettingsExportProfitPriceHandlingInfo'|translate"
+                         for="ProfitPriceHandling">{{'SettingsExportProfitPriceHandling'|translate}}:</label>
+                  @if (export.controls['Status'].value) {
+                    <input [formControl]="profitPriceHandling"
+                           id="ProfitPriceHandling"
+                           type="checkbox" />
+                  } @else {
+                    <input [formControl]="profitPriceHandling"
+                           id="ProfitPriceHandling"
+                           type="hidden" />
+                    <input [attr.checked]="profitPriceHandling.value ? 'checked' : undefined"
+                           disabled
+                           type="checkbox" />
+                  }
+                </p>
+              }
+              @if (export.controls['ProfitPriceMinValue']; as profitPriceMinValue) {
+                <p>
+                  <label for="ProfitPriceMinValue">{{'SettingsExportProfitPriceMinValue'|translate}}:</label>
+                  <input [attr.readonly]="!export.controls['Status'].value || !export.controls['ProfitPriceHandling'].value ? 'readonly' : undefined"
+                         [formControl]="profitPriceMinValue"
+                         id="ProfitPriceMinValue"
+                         type="number" />
+                  {{'SettingsUnitCurrencyPerMWH'|translate}}
+                  @if (profitPriceMinValue.errors) {
+                    <span class="error">{{profitPriceMinValue.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['ProfitPriceMinBatterySoC']; as profitPriceMinBatterySoC) {
+                <p>
+                  <label for="ProfitPriceMinBatterySoC">{{'SettingsExportProfitPriceMinBatterySoC'|translate}}:</label>
+                  <input [attr.readonly]="!export.controls['Status'].value || !export.controls['ProfitPriceHandling'].value ? 'readonly' : undefined"
+                         [formControl]="profitPriceMinBatterySoC"
+                         id="ProfitPriceMinBatterySoC"
+                         type="number" />
+                  {{'SettingsUnitPercent'|translate}}
+                  @if (profitPriceMinBatterySoC.errors) {
+                    <span class="error">{{profitPriceMinBatterySoC.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['ProfitPriceMaxQuarterCount']; as profitPriceMaxQuarterCount) {
+                <p>
+                  @let metering = +data.settingsForm.controls['MeteringInterval'].value;
+                  <label for="ProfitPriceMaxQuarterCount">{{(metering ? 'SettingsExportProfitPriceMaxQuarterCount' : 'SettingsExportProfitPriceMaxHourCount')|translate}}:</label>
+                  <input [attr.readonly]="!export.controls['Status'].value || !export.controls['ProfitPriceHandling'].value ? 'readonly' : undefined"
+                         [formControl]="profitPriceMaxQuarterCount"
+                         id="ProfitPriceMaxQuarterCount"
+                         type="number" />
+                  @if (profitPriceMaxQuarterCount.errors) {
+                    <span class="error">{{profitPriceMaxQuarterCount.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (export.controls['ProfitPriceBiasPower']; as profitPriceBiasPower) {
+                <p>
+                  <label for="ProfitPriceBiasPower">{{'SettingsExportProfitPriceBiasPower'|translate}}:</label>
+                  <input [attr.readonly]="!export.controls['Status'].value || !export.controls['ProfitPriceHandling'].value ? 'readonly' : undefined"
+                         [formControl]="profitPriceBiasPower"
+                         id="ProfitPriceBiasPower"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (profitPriceBiasPower.errors) {
+                    <span class="error">{{profitPriceBiasPower.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+            </div>
+          </fieldset>
+        }
+
+        @if (data.settingsForm.controls['SmartExport']; as smartExport) {
+          <fieldset>
+            <legend>{{'SettingsSmartExport'|translate}}</legend>
+
+            <div class="settings-block">
+              @if (smartExport.controls['Status']; as status) {
+                <p>
+                  <label for="Status">{{'SettingsStatus'|translate}}:</label>
+                  @if (data.settingsForm.controls['Export'].controls['Status'].value) {
+                    <input [formControl]="status"
+                           id="Status"
+                           type="checkbox" />
+                  } @else {
+                    <input [formControl]="status"
+                           id="Status"
+                           type="hidden" />
+                    <input [attr.checked]="status.value ? 'checked' : undefined"
+                           disabled
+                           type="checkbox" />
+                  }
+                </p>
+              }
+              <p>
+                @if (smartExport.controls['MonthStart']; as monthStart) {
+                  <span>
+                    <label for="MonthStart">{{'SettingsSmartExportMonthStart'|translate}}:</label>
+                    @if (smartExport.controls['Status'].value) {
+                      <select [formControl]="monthStart"
+                              id="MonthStart">
+                        @for (month of data.months; let index = $index; track index) {
+                          <option [attr.selected]="monthStart.value === index + 1 ? 'selected' : undefined"
+                                  [attr.value]="index + 1">{{month}}</option>
+                        }
+                      </select>
+                    } @else {
+                      <input [attr.value]="data.months[monthStart.value - 1]"
+                             class="input-text"
+                             id="MonthStart"
+                             readonly
+                             type="text" />
+                    }
+                    @if (monthStart.errors) {
+                      <span class="error">{{monthStart.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartExport.controls['MonthEnd']; as monthEnd) {
+                  <span>
+                    <label for="MonthEnd">{{'SettingsSmartExportMonthEnd'|translate}}:</label>
+                    @if (smartExport.controls['Status'].value) {
+                      <select [formControl]="monthEnd"
+                              id="MonthEnd">
+                        @for (month of data.months; let index = $index; track index) {
+                          <option [attr.selected]="monthEnd.value === index + 1 ? 'selected' : undefined"
+                                  [attr.value]="index + 1">{{month}}</option>
+                        }
+                      </select>
+                    } @else {
+                      <input [attr.value]="data.months[monthEnd.value - 1]"
+                             class="input-text"
+                             id="MonthEnd"
+                             readonly
+                             type="text" />
+                    }
+                    @if (monthEnd.errors) {
+                      <span class="error">{{monthEnd.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+              </p>
+              <p>
+                @if (smartExport.controls['HourStart']; as hourStart) {
+                  <span>
+                    <label for="HourStart">{{'SettingsSmartExportHourStart'|translate}}:</label>
+                    <input [attr.max]="smartExport.controls['HourEnd'].value - 1"
+                           [attr.min]="0"
+                           [attr.readonly]="smartExport.controls['Status'].value ? undefined : 'readonly'"
+                           [formControl]="hourStart"
+                           id="HourStart"
+                           type="number" />
+                    @if (hourStart.errors) {
+                      <span class="error">{{hourStart.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartExport.controls['HourEnd']; as hourEnd) {
+                  <span>
+                    <label for="HourEnd">{{'SettingsSmartExportHourEnd'|translate}}:</label>
+                    <input [attr.max]="23"
+                           [attr.min]="smartExport.controls['HourStart'].value + 1"
+                           [attr.readonly]="smartExport.controls['Status'].value ? undefined : 'readonly'"
+                           [formControl]="hourEnd"
+                           id="HourEnd"
+                           type="number" />
+                    @if (hourEnd.errors) {
+                      <span class="error">{{hourEnd.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartExport.controls['HourStart'] && smartExport.controls['HourEnd']) {
+                  {{'SettingsSmartExportHours'|translate}}
+                }
+              </p>
+              @if (smartExport.controls['QuartersBelowThreshold']; as quartersBelowThreshold) {
+                <p>
+                  @let metering = +data.settingsForm.controls['MeteringInterval'].value;
+                  <label for="QuartersBelowThreshold">{{(metering ? 'SettingsSmartExportQuartersBelowThreshold' : 'SettingsSmartExportHoursBelowThreshold')|translate}}:</label>
+                  <input [attr.readonly]="smartExport.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="quartersBelowThreshold"
+                         id="QuartersBelowThreshold"
+                         max="20"
+                         min="1"
+                         type="number" />
+                  @if (quartersBelowThreshold.errors) {
+                    <span class="error">{{quartersBelowThreshold.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (smartExport.controls['MinBatterySoC']; as minBatterySoC) {
+                <p>
+                  <label for="MinBatterySoC">{{'SettingsSmartExportMinBatterySoC'|translate}}:</label>
+                  <input [attr.readonly]="smartExport.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="minBatterySoC"
+                         id="MinBatterySoC"
+                         type="number" />
+                  {{'SettingsUnitPercent'|translate}}
+                  @if (minBatterySoC.errors) {
+                    <span class="error">{{minBatterySoC.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (smartExport.controls['MinPVEPower']; as minPVEPower) {
+                <p>
+                  <label for="MinPVEPower">{{'SettingsSmartExportMinPVEPower'|translate}}:</label>
+                  <input [attr.readonly]="smartExport.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="minPVEPower"
+                         id="MinPVEPower"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (minPVEPower.errors) {
+                    <span class="error">{{minPVEPower.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+            </div>
+          </fieldset>
+        }
+
+        @if (data.settingsForm.controls['SmartCharge']; as smartCharge) {
+          <fieldset>
+            <legend>
+              {{'SettingsSmartCharge'|translate}}
+              <span class="legend-small">{{'SettingsSpotControlled'|translate}}</span>
+            </legend>
+            <div class="settings-block">
+              @if (smartCharge.controls['Status']; as status) {
+                <p>
+                  <label for="Status">{{'SettingsStatus'|translate}}:</label>
+                  <input [formControl]="status"
+                         id="Status"
+                         type="checkbox" />
+                </p>
+              }
+              <p>
+                @if (smartCharge.controls['MonthStart']; as monthStart) {
+                  <span>
+                    <label for="MonthStart">{{'SettingsSmartExportMonthStart'|translate}}:</label>
+                    @if (smartCharge.controls['Status'].value) {
+                      <select [formControl]="monthStart"
+                              id="MonthStart">
+                        @for (month of data.months; let index = $index; track index) {
+                          <option [attr.selected]="monthStart.value === index + 1 ? 'selected' : undefined"
+                                  [attr.value]="index + 1">{{month}}</option>
+                        }
+                      </select>
+                    } @else {
+                      <input [attr.value]="data.months[monthStart.value - 1]"
+                             class="input-text"
+                             id="MonthStart"
+                             readonly
+                             type="text" />
+                    }
+                    @if (monthStart.errors) {
+                      <span class="error">{{monthStart.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartCharge.controls['MonthEnd']; as monthEnd) {
+                  <span>
+                    <label for="MonthEnd">{{'SettingsSmartExportMonthEnd'|translate}}:</label>
+                    @if (smartCharge.controls['Status'].value) {
+                      <select [formControl]="monthEnd"
+                              id="MonthEnd">
+                        @for (month of data.months; let index = $index; track index) {
+                          <option [attr.selected]="monthEnd.value === index + 1 ? 'selected' : undefined"
+                                  [attr.value]="index + 1">{{month}}</option>
+                        }
+                      </select>
+                    } @else {
+                      <input [attr.value]="data.months[monthEnd.value - 1]"
+                             class="input-text"
+                             id="MonthEnd"
+                             readonly
+                             type="text" />
+                    }
+                    @if (monthEnd.errors) {
+                      <span class="error">{{monthEnd.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+              </p>
+              <p>
+                @if (smartCharge.controls['HourStart']; as hourStart) {
+                  <span>
+                    <label for="HourStart">{{'SettingsSmartExportHourStart'|translate}}:</label>
+                    <input [attr.max]="23"
+                           [attr.min]="0"
+                           [attr.readonly]="smartCharge.controls['Status'].value ? undefined : 'readonly'"
+                           [formControl]="hourStart"
+                           id="HourStart"
+                           type="number" />
+                    @if (hourStart.errors) {
+                      <span class="error">{{hourStart.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartCharge.controls['HourEnd']; as hourEnd) {
+                  <span>
+                    <label for="HourEnd">{{'SettingsSmartExportHourEnd'|translate}}:</label>
+                    <input [attr.max]="23"
+                           [attr.min]="0"
+                           [attr.readonly]="smartCharge.controls['Status'].value ? undefined : 'readonly'"
+                           [formControl]="hourEnd"
+                           id="HourEnd"
+                           type="number" />
+                    @if (hourEnd.errors) {
+                      <span class="error">{{hourEnd.errors|errors:errorMap}}</span>
+                    }
+                  </span>
+                }
+                @if (smartCharge.controls['HourStart'] && smartCharge.controls['HourEnd']) {
+                  {{'SettingsSmartExportHours'|translate}}
+                }
+              </p>
+              @if (smartCharge.controls['MinBatterySoC']; as minBatterySoC) {
+                <p>
+                  <label for="MinBatterySoC">{{'SettingsSmartExportMinBatterySoC'|translate}}:</label>
+                  <input [attr.readonly]="smartCharge.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="minBatterySoC"
+                         id="MinBatterySoC"
+                         type="number" />
+                  {{'SettingsUnitPercent'|translate}}
+                  @if (minBatterySoC.errors) {
+                    <span class="error">{{minBatterySoC.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (smartCharge.controls['OffPVEPower']; as offPVEPower) {
+                <p>
+                  <label for="OffPVEPower">{{'SettingsSmartChargeOffPVEPower'|translate}}:</label>
+                  <input [attr.readonly]="smartCharge.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="offPVEPower"
+                         id="OffPVEPower"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  @if (offPVEPower.errors) {
+                    <span class="error">{{offPVEPower.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              @if (smartCharge.controls['PricesCount']; as pricesCount) {
+                <p>
+                  <label for="PricesCount">{{'SettingsSmartChargePricesCount'|translate}}:</label>
+                  <input [attr.readonly]="smartCharge.controls['Status'].value ? undefined : 'readonly'"
+                         [formControl]="pricesCount"
+                         id="PricesCount"
+                         type="number" />
+                  @if (pricesCount.errors) {
+                    <span class="error">{{pricesCount.errors|errors:errorMap}}</span>
+                  }
+                </p>
+              }
+              <hr />
+              @if (smartCharge.controls['ManualControl']; as manualControl) {
+                <p>
+                  <label [attr.title]="'SettingsSmartChargeManualControlInfo'|translate"
+                         for="ManualControl">{{'SettingsSmartChargeManualControl'|translate}}:</label>
+                  <input [formControl]="manualControl"
+                         id="ManualControl"
+                         type="checkbox" />
+                </p>
+              }
+            </div>
+          </fieldset>
+        }
+
+        <p>
+          <button [disabled]="!data.settingsForm.valid || data.settingsForm.pristine"
+                  type="submit">{{
+            'SettingsSave'|translate
+          }}</button>
+          <button (click)="data.settingsForm.reset(data.settingsData)"
+                  [disabled]="!data.settingsForm.dirty"
+                  class="secondary"
+                  type="button">{{
+            'SettingsReset'|translate
+          }}</button>
+        </p>
+      </form>
+    } @else {
+      <p>
+        <em>{{'Loading'|translate}}</em>
+      </p>
+    }
+  </fieldset>
+
+  @if (data.registryData) {
+    <details>
+      <summary>{{'SettingsRegistry'|translate}}</summary>
+      <form (ngSubmit)="saveRegistry()"
+            [autocomplete]="false"
+            [formGroup]="data.registryForm"
+            action="#">
+
+        <div class="settings-block">
+          <fieldset>
+            <legend>{{'SettingsBasic'|translate}}</legend>
+
+            @if (data.registryForm.controls['WorkingMode']; as workingMode) {
+              <p>
+                <label for="RegistryWorkingMode">{{'WorkingMode'|translate}}:</label>
+                <select [formControl]="workingMode"
+                        id="RegistryWorkingMode">
+                  @for (mode of workingModes; let index = $index; track index) {
+                    <option [attr.selected]="workingMode.value === index ? 'selected' : undefined"
+                            [attr.value]="index">{{mode|translate}}</option>
+                  }
+                </select>
+                &nbsp;
+                <button (click)="saveRegistry({WorkingMode: +workingMode.value})"
+                        [disabled]="!workingMode.dirty"
+                        data-type="submit"
+                        type="button">{{
+                  'SettingsSave'|translate
+                }}</button>
+              </p>
+
+              @if (0 === +workingMode.value) { <!-- WorkingModeSelfUse -->
+                @if (data.registryForm.controls['SelfUseMinSoC']; as selfUseMinSoC) {
+                  <p>
+                    <label for="RegistrySelfUseMinSoC">{{'SettingsRegistrySelfUseMinSoC'|translate}}:</label>
+                    <input [formControl]="selfUseMinSoC"
+                           id="RegistrySelfUseMinSoC"
+                           type="number" />
+                    {{'SettingsUnitPercent'|translate}}
+                    &nbsp;
+                    <button (click)="saveRegistry({SelfUseMinSoC: selfUseMinSoC.value})"
+                            [disabled]="!selfUseMinSoC.dirty"
+                            data-type="submit"
+                            type="button">{{
+                      'SettingsSave'|translate
+                    }}</button>
+                  </p>
+                }
+              }
+              @if (3 === +workingMode.value) { <!-- WorkingModeManual -->
+                @if (data.registryForm.controls['ManualModeCharging']; as manualModeCharging) {
+                  <p>
+                    <label for="RegistryManualForceCharge">{{'ManualModeCharging'|translate}}:</label>
+                    <select [formControl]="manualModeCharging"
+                        id="RegistryManualForceCharge">
+                      @for (mode of manualModes; let index = $index; track index) {
+                        <option [attr.selected]="manualModeCharging.value === index ? 'selected' : undefined"
+                                [attr.value]="index">{{mode|translate}}</option>
+                      }
+                    </select>
+                    &nbsp;
+                    <button (click)="saveRegistry({WorkingMode: +workingMode.value, ManualModeCharging: manualModeCharging.value})"
+                            [disabled]="!manualModeCharging.dirty"
+                            data-type="submit"
+                            type="button">{{
+                      'SettingsSave'|translate
+                    }}</button>
+                  </p>
+                }
+              }
+            }
+          </fieldset>
+
+          <fieldset>
+            <legend>{{'SettingsAdvanced'|translate}}</legend>
+
+            @if (data.registryForm.controls['ExportControl']; as exportControl) {
+              <p>
+                <label for="RegistryExportControl">{{'SettingsRegistryExportControl'|translate}}:</label>
+                <input [formControl]="exportControl"
+                       id="RegistryExportControl"
+                       type="number" />
+                {{'SettingsUnitWatt'|translate}}
+                &nbsp;
+                <button (click)="saveRegistry({ExportControl: exportControl.value})"
+                        [disabled]="!exportControl.dirty"
+                        data-type="submit"
+                        type="button">{{
+                  'SettingsSave'|translate
+                }}</button>
+              </p>
+            }
+            @if (data.registryForm.controls['BiasMode']; as biasMode) {
+              <p>
+                <label for="RegistryBiasMode">{{'BiasMode'|translate}}:</label>
+                <select [formControl]="biasMode"
+                        id="RegistryBiasMode">
+                  @for (mode of biasModes; let index = $index; track index) {
+                    <option [attr.selected]="biasMode.value === index ? 'selected' : undefined"
+                            [attr.value]="index">{{mode|translate}}</option>
+                  }
+                </select>
+                &nbsp;
+                @if (0 !== +biasMode.value) {
+                  <input [formControl]="data.registryForm.controls['BiasPower']"
+                         type="number" />
+                  {{'SettingsUnitWatt'|translate}}
+                  &nbsp;
+                }
+                <button (click)="saveRegistry({BiasMode: +biasMode.value, BiasPower: data.registryForm.controls['BiasPower'].value})"
+                        [disabled]="!biasMode.dirty && !data.registryForm.controls['BiasPower'].dirty"
+                        data-type="submit"
+                        type="button">{{
+                  'SettingsSave'|translate
+                }}</button>
+              </p>
+            }
+          </fieldset>
+
+          <p>
+            <button [disabled]="!data.registryForm.valid || data.registryForm.pristine"
+                    type="submit">{{
+              'SettingsSave'|translate
+            }}</button>
+            <button (click)="data.registryForm.reset(data.registryData)"
+                    [disabled]="!data.registryForm.dirty"
+                    class="secondary"
+                    type="button">{{
+              'SettingsReset'|translate
+            }}</button>
+          </p>
+        </div>
+      </form>
+
+      <details>
+        <summary>{{'RTCSettings'|translate}}</summary>
+        @if (data.realTimeClockForm.controls['DateTime']; as dateTime) {
+          @let dateTimes = dateTimesSg();
+          <p>
+            <label for="CurrentTime">{{'RTCCurrentTime'|translate}}:</label>
+            <span id="CurrentTime">{{dateTimes.current|dateFmt:'medium'}}</span>
+          </p>
+          <p>
+            <label for="InverterRTC">{{'RTCInverterTime'|translate}}:</label>
+            <span id="InverterRTC">{{dateTimes.inverter|dateFmt:'medium'}}</span>
+          </p>
+          <p>
+            <label for="NewRTCTime">{{'RTCNewTime'|translate}}:</label>
+            <input [formControl]="dateTime"
+                   id="NewRTCTime"
+                   type="datetime-local" />
+            &nbsp;
+            <button (click)="saveRegistry({DateTime: dateTime.value})"
+                    data-type="submit"
+                    type="button">{{
+              'SettingsSave'|translate
+            }}</button>
+            &nbsp;
+            <button (click)="syncRTC()"
+                    [attr.title]="'RTCSyncWithBrowser'|translate"
+                    class="danger icon-refresh"
+                    data-type="submit"
+                    type="button"></button>
+          </p>
+        }
+      </details>
+    </details>
+  } @else {
+    <p>
+      <em>{{'Loading'|translate}}</em>
+    </p>
+  }
+}

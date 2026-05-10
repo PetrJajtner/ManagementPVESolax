@@ -23,7 +23,59 @@ If everything is set up correctly, you can run the application on your domain. I
 
 ![Mandatory settings](/images/settings-en.png)
 
-You can use the "Test connection" button to test the connection with the inverter. After a successful connection, the most important application settings are complete.
+You can use the "Test connection" button to test the connection with the inverter.
+
+Next, you need to create a service that will be the central point for retrieving data from the WiFi Dongle. You need to have PHP and shared memory set up correctly:
+
+```plaintext
+php -m | grep sysv
+```
+
+The output should contain
+
+```plaintext
+sysvshm
+sysvsem
+```
+
+After that, you need to make the file /api/sensors.php executable:
+
+```plaintext
+chmod +x sensors.php
+```
+
+This is all ready to create a systemd service on Linux (author's note: I'm using Debian, on other distros the creation of services may differ):
+
+```plaintext
+touch /etc/systemd/system/sensors.service
+```
+
+and the content:
+
+```plaintext
+[Unit]
+Description=Sensor PHP Shared Memory Writer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/php /var/www/[your-domain]/api/sensors.php
+Restart=always
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then register and enable:
+
+```plaintext
+systemctl daemon-reload
+systemctl enable sensors
+systemctl start sensors
+```
+
+This completes the most important application setup.
 
 _Current supported inverters_
 *   _X3 Hybrid G4_
@@ -59,7 +111,58 @@ Pokud máme správně vše nastaveno, je možné spustit aplikaci na vaší dom�
 
 ![Povinné nastavení](/images/settings-cs.png)
 
-K otestování spojení se střídačem je možné použít tlačítka „Otestovat spojení“. Po úspěšném spojení je nejdůležitější nastavení aplikace dokončeno.
+K otestování spojení se střídačem je možné použít tlačítka „Otestovat spojení“.
+
+Dále je nutné vytvořit službu, která bude centrálním bodem pro načítání údajů z WiFi Donglu. Je zapotřebí mít správně nastavené PHP a sdílenou paměť:
+
+```plaintext
+php -m | grep sysv
+```
+
+Výstup by měl obsahovat
+
+```plaintext
+sysvshm
+sysvsem
+```
+
+Následně je nutné mít soubor /api/sensors.php jako spustitelný:
+
+```plaintext
+chmod +x sensors.php
+```
+
+Tím je vše přichystané pro vytvoření služby systemd na Linuxu (pozn. autora: používám Debian, na jiných distrech se může vytváření služeb lišit):
+
+```plaintext
+touch /etc/systemd/system/sensors.service
+```
+
+a obsah:
+```plaintext
+[Unit]
+Description=Sensor PHP Shared Memory Writer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/php /var/www/[vase-domena]/api/sensors.php
+Restart=always
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Následně zaregistrovat a povolit:
+
+```plaintext
+systemctl daemon-reload
+systemctl enable sensors
+systemctl start sensors
+```
+
+Tímto je nejdůležitější nastavení aplikace dokončeno.
 
 _Aktuální podporované střídače_
 *   _X3 Hybrid G4_

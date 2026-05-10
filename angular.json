@@ -58,9 +58,7 @@
               "base": "dist",
               "browser": ""
             },
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": [],
             "scripts": [],
             "styles": [],
             "tsConfig": "tsconfig.app.json"
@@ -97,40 +95,48 @@
       "prefix": "",
       "projectType": "application",
       "root": "",
-      "schematics": {
-        "@schematics/angular:application": {
-          "strict": true
-        },
-        "@schematics/angular:class": {
-          "skipTests": true
-        },
-        "@schematics/angular:component": {
-          "changeDetection": "OnPush",
-          "skipTests": true,
-          "standalone": false,
-          "style": "none"
-        },
-        "@schematics/angular:directive": {
-          "skipTests": true
-        },
-        "@schematics/angular:guard": {
-          "skipTests": true
-        },
-        "@schematics/angular:interceptor": {
-          "skipTests": true
-        },
-        "@schematics/angular:pipe": {
-          "skipTests": true,
-          "standalone": false
-        },
-        "@schematics/angular:resolver": {
-          "skipTests": true
-        },
-        "@schematics/angular:service": {
-          "skipTests": true
-        }
-      },
       "sourceRoot": "src"
+    }
+  },
+  "schematics": {
+    "@schematics/angular:application": {
+      "strict": true
+    },
+    "@schematics/angular:class": {
+      "skipTests": true
+    },
+    "@schematics/angular:component": {
+      "changeDetection": "OnPush",
+      "skipTests": true,
+      "standalone": true,
+      "style": "none",
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true,
+      "standalone": true,
+      "type": "directive"
+    },
+    "@schematics/angular:guard": {
+      "skipTests": true,
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "skipTests": true,
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true,
+      "standalone": true,
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "skipTests": true,
+      "typeSeparator": "."
+    },
+    "@schematics/angular:service": {
+      "skipTests": true,
+      "type": "service"
     }
   },
   "version": 1
