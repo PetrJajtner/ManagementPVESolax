@@ -1,9 +1,20 @@
+/* eslint-disable no-undef */
 /**
  * Nahradi obsah souboru src/app/app.settings.ts sablonou se statickou konfiguraci
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+Date.prototype.toLocalJSON = function() {
+  const
+    pad = (n, len = 2) => `${Math.floor(Math.abs(n))}`.padStart(len, '0'),
+    offset = -this.getTimezoneOffset(),
+    tz = 0 === offset ? 'Z' : ((offset > 0 ? '+' : '-') + pad(offset / 60) + ':' + pad(offset % 60))
+  ;
+  return this.getFullYear() + '-' + pad(this.getMonth() + 1) + '-' + pad(this.getDate()) + 'T' +
+         pad(this.getHours()) + ':' + pad(this.getMinutes()) + ':' + pad(this.getSeconds()) + '.' + pad(this.getMilliseconds(), 3) + tz;
+};
 
 const
   baseDir = path.dirname(path.dirname(fileURLToPath(import.meta.url))),
@@ -31,7 +42,7 @@ try {
   const
     name = Object.keys(angularJson.projects)[0],
     [version, build] = packageJson.version.split('-'),
-    date = (new Date()).toJSON()
+    date = (new Date()).toLocalJSON()
   ;
 
   template = template.replace(/%APP_BUILD%/g, build ?? '');

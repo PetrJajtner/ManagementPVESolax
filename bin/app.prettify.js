@@ -1,9 +1,11 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /**
  * Zformatuje vystupni soubor index.html
  */
 import fs from 'fs';
 import path from 'path';
-import pretty from 'pretty';
+import * as prettier from "prettier";
 import { fileURLToPath } from 'url';
 
 const
@@ -21,8 +23,8 @@ const
 
   indexFile = path.join(sourceDir, 'index.html'),
 
-  searchForJS = /src=\"(.*?)(\.js).*?\"/g,
-  searchForCSS = /href=\"(.*?)(\.css).*?\"/g
+  searchForJS = /src="(.*?)(\.js).*?"/g,
+  searchForCSS = /href="(.*?)(\.css).*?"/g
 ;
 
 try {
@@ -54,11 +56,11 @@ try {
   }
 
   const original = fs.readFileSync(indexFile, {encoding});
-  let modified = (pretty(original, {ocd: true}) || '').replace(/^\s+/, '') + '\n';
+  let modified = await prettier.format(original, {parser: 'html', printWidth: 120, tabWidth: 2, useTabs: false});
 
-  modified = modified.replace(/<meta(.*[^\/])?>/g, '<meta$1 />');
-  modified = modified.replace(/<base(.*[^\/])?>/g, '<base$1 />');
-  modified = modified.replace(/<link(.*[^\/])?>/g, '<link$1 />');
+  modified = modified.replace(/<meta(.*[^/])?>/g, '<meta$1 />');
+  modified = modified.replace(/<base(.*[^/])?>/g, '<base$1 />');
+  modified = modified.replace(/<link(.*[^/])?>/g, '<link$1 />');
 
   modified = modified.replace(/(<link\s+rel="stylesheet")\s+(href=)/g, '$1 type="text/css" $2');
 
@@ -73,6 +75,8 @@ try {
     !matches[1].includes('theme-') && renameToBN(matches[1], matches[2]);
     return `href="${matches[1]}.${build}${matches[2]}"`;
   });
+
+  renameToBN(path.join('assets', 'dictionary'), '.json');
 
   if (original !== modified) {
     console.log(`PRETTIFY: Cislo buildu: ${build}\n`);

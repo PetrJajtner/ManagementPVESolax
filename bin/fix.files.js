@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Poupravi obsahy souboru v node_modules
  */
@@ -6,6 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   baseDir = path.dirname(path.dirname(fileURLToPath(import.meta.url))),
   encoding = 'utf8',
   mods = [
